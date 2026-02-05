@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz AyiWeb</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  padding: 20px;
+}
+#quiz-container button {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 12px;
+  font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<h1 id="quiz-title">Quiz</h1>
+<div id="quiz-container"></div>
+<div id="result"></div>
+
+<script>
+// ================= FIREBASE =================
+const firebaseConfig = {
+  apiKey: "AIzaSyAQeHWr_vUiQmVVgJJ_cOF9qrCCLd7IJNc",
+  authDomain: "ayiweb.firebaseapp.com",
+  databaseURL: "https://ayiweb-default-rtdb.firebaseio.com",
+  projectId: "ayiweb",
+  storageBucket: "ayiweb.appspot.com",
+  messagingSenderId: "115054504556",
+  appId: "1:115054504556:web:ccd713ba01dd8f02830649"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ================= PARAM QUIZ =================
+const params = new URLSearchParams(window.location.search);
+const quizId = params.get("quiz");
+
+if (!quizId) {
+  document.body.innerHTML = "<h2>❌ Quiz introuvable</h2>";
+  throw new Error("Quiz ID manquant");
+}
+
+document.getElementById("quiz-title").innerText = "Quiz : " + quizId;
+
+// ================= QUIZ LOGIC =================
+let questions = [];
+let current = 0;
+let score = 0;
+
+const quizContainer = document.getElementById("quiz-container");
+const resultContainer = document.getElementById("result");
+
+// Charger quiz spécifique
+db.ref("quizs/" + quizId + "/questions").once("value", snapshot => {
+  if (!snapshot.exists()) {
+    quizContainer.innerHTML = "<p>⚠️ Aucun quiz trouvé.</p>";
+    return;
+  }
+
+  questions = [];
+  snapshot.forEach(child => {
+    questions.push(child.val());
+  });
+
+  showQuestion();
+});
+
+function showQuestion() {
+  if (current >= questions.length) {
+    quizContainer.innerHTML = "";
+    resultContainer.innerHTML = `<h2>Score : ${score} / ${questions.length}</h2>`;
+
+    const name = prompt("Ton nom ?");
+    if (name) {
+      db.ref("scores/" + quizId).push({
+        name: name,
+        score: score,
+        date: Date.now()
+      });
+    }
+    return;
+  }
+
+  const q = questions[current];
+  let html = `<h3>${q.question}</h3>`;
+  q.options.forEach((opt, i) => {
+    html += `<button onclick="checkAnswer(${i})">${opt}</button>`;
+  });
+
+  quizContainer.innerHTML = html;
+}
+
+function checkAnswer(index) {
+  if (index === qAnswer()) score++;
+  current++;
+  showQuestion();
+}
+
+function qAnswer() {
+  return questions[current].answer;
+}
+</script>
+
+</body>
+</html>

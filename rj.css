@@ -1,0 +1,586 @@
+@media all {
+  /* ============================================
+     CATÉGORIE 1 : RESET & BASE GLOBALE
+     ============================================ */
+  body, main {
+    padding: 0;
+    margin: 0;
+  }
+
+  /* ============================================
+     CATÉGORIE 2 : UTILITAIRES D'AFFICHAGE
+     ============================================ */
+  .tab { 
+    display: none; 
+  }
+  
+  .tab.active { 
+    display: block; 
+  }
+  
+  .hidden { 
+    display: none; 
+  }
+
+  /* ============================================
+     CATÉGORIE 3 : PAGE D'ACCUEIL
+     ============================================ */
+  @media all{
+    #homeContent {
+    font-family: 'Times New Roman', serif;
+    font-size: 14px;
+    padding: 1px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    max-width: 700px;
+    margin: 2px auto;
+  }
+
+  #homeContent h2 {
+    font-size: 20px;
+    color: #333;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  #homeContent p {
+    margin: 8px 0;
+    color: #555;
+    text-align: center;
+    line-height: normal;
+  }
+
+  #home h3 {
+    font-size: 18px;
+    text-align: center; 
+    margin: 10px;
+    padding: 10px;
+  }
+
+  #homet {
+    color: green;
+    font-size: 18px;
+    text-align: center;
+  }
+
+  #homes {
+    color: black;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  /* Cartes plateformes */
+  .card {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .itemCard {
+    flex: 1;
+    min-width: 140px;
+    padding: 15px;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .itemCard i {
+    font-size: 28px;
+  }
+
+  .itemCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  }
+
+  .itemCard.youtube {
+    background: linear-gradient(135deg, #ff0000, #cc0000);
+  }
+
+  .itemCard.facebook {
+    background: linear-gradient(135deg, #1877f2, #0f5dc7);
+  }
+
+  /* Bouton abonnement */
+  #btnSubscribe {
+    padding: 10px 15px;
+    height: 50px;
+    border: none;
+    border-radius: 6px;
+    background: #25D366;
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    display: block;
+    margin: 10px auto;
+    transition: 0.2s;
+  }
+
+  #btnSubscribe:hover {
+    background: #1ebe57;
+  }
+
+  /* Espace vidéo */
+  #videoSpace {
+    margin: 15px 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    height: auto;
+    background: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #888;
+    font-weight: bold;
+  }
+
+  /* ============================================
+     CATÉGORIE 4 : GESTION DES CATÉGORIES
+     ============================================ */
+  /* Container kategori sticky */
+  .listCategories, #homeCategories {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  #homeCategories {
+    flex-wrap: wrap;
+    margin: 10px 0;
+  }
+
+  /* Bouton kategori */
+  .cat-btn {
+    flex: 0 0 auto;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 20px;
+    background: #f0f0f0;
+    color: #333;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Bouton kategori HOME spécifique */
+  #homeCategories .cat-btn {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+  }
+
+  /* États des boutons */
+  .cat-btn:hover {
+    background: #28a745;
+    color: #fff;
+  }
+
+  .cat-btn.active {
+    background: #25D366;
+    color: #fff;
+    font-weight: bold;
+  }
+
+  #homeCategories .cat-btn:hover {
+    background: #25d366;
+    color: white;
+    border-color: #25d366;
+    transform: translateY(-2px);
+  }
+
+  /* Barre de défilement */
+  .listCategories::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .listCategories::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
+
+  /* ============================================
+     CATÉGORIE 5 : COMPTEUR D'ARTICLES
+     ============================================ */
+  .articleCount {
+    width: 98%;
+    font-weight: 700;
+    color: #1f7a4d;
+    background: #dff5ea;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px auto;
+    display: inline-block;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    animation: pulseBadge 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulseBadge {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  }
+  /* ============================================
+     CATÉGORIE 6 : LISTE D'ARTICLES
+     ============================================ */
+  #listData {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 1px;
+    padding: 2px;
+    font-family: "Times New Roman", serif;
+    font-size: 16px;
+  }
+
+  /* Item individuel */
+  .list-item {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 2px;
+    margin: 1px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-family: "Times New Roman", serif;
+    font-size: 14px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .list-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+  }
+
+  .list-item h3 {
+    margin: 0 0 4px 0;
+    color: #333;
+    font-family: "Times New Roman", serif;
+    font-size: 20px;
+  }
+
+  .list-item p {
+    margin: 0 0 4px 0;
+    color: #555;
+    font-family: "Times New Roman", serif;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .list-item a {
+    display: inline-block;
+    margin-bottom: 4px;
+    text-decoration: none;
+    color: #007bff;
+    font-family: "Times New Roman", serif;
+    font-size: 16px;
+  }
+
+  .list-item a:hover {
+    text-decoration: underline;
+  }
+
+  /* ============================================
+     CATÉGORIE 7 : MÉDIAS (Images, Vidéos, Audio)
+     ============================================ */
+  .list-item .media-image,
+  .list-item .media-video,
+  .list-item .media-audio {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 10px 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Hover effet pour vidéo et image */
+  .list-item .media-image:hover,
+  .list-item .media-video:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  }
+
+  /* Iframe YouTube */
+  .list-item .media-video.youtube iframe {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  /* Video HTML5 */
+  .list-item video {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    outline: none;
+  }
+
+  /* Audio HTML5 */
+  .list-item .media-audio {
+    width: 100%;
+    outline: none;
+    border-radius: 8px;
+    padding: 3px 5px;
+    background: #f5f5f5;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  /* ============================================
+     CATÉGORIE 8 : BADGES DE CATÉGORIES
+     ============================================ */
+  .badge-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 6px;
+  }
+
+  .category-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    border-radius: 15px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .category-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+
+  /* ============================================
+     CATÉGORIE 9 : ACTIONS (Like, Share, Back)
+     ============================================ */
+  .actions {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+
+  .actions button {
+    padding: 2px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f0f0f0;
+    font-family: "Times New Roman", serif;
+    transition: 0.2s;
+  }
+
+  .actions button:hover {
+    background: #e0e0e0;
+  }
+
+  .actions button .count {
+    font-weight: bold;
+    font-family: "Times New Roman", serif;
+    font-size: 16px;
+  }
+
+  /* Bouton Retour */
+  #backBtn {
+    padding: 2px 6px;
+    margin-bottom: 4px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #f0f0f0;
+    font-family: "Times New Roman", serif;
+    font-size: 14px;
+  }
+
+  #backBtn:hover {
+    background: #e0e0e0;
+  }
+
+  /* ============================================
+     CATÉGORIE 10 : PAGE DE DÉTAIL D'ARTICLE
+     ============================================ */
+  #detailList {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 2px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-family: "Times New Roman", serif;
+    font-size: 16px;
+  }
+
+  #detailList h2 {
+    margin: 0 0 4px 0;
+    color: #333;
+    font-family: "Times New Roman", serif;
+    font-size: 14px;
+  }
+
+  #detailList p {
+    margin: 0 0 4px 0;
+    color: #555;
+    font-family: "Times New Roman", serif;
+    font-size: 14px;
+  }
+
+  #detailList div {
+    font-family: "Times New Roman", serif;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.4;
+  }
+
+  #detailList ul {
+    padding-left: 10px;
+  }
+
+  #detailList ul li {
+    margin-left: 10px;
+  }
+
+  /* ============================================
+     CATÉGORIE 11 : SYSTÈME DE COMMENTAIRES
+     ============================================ */
+  #commentsSection {
+    font-family: Arial, sans-serif;
+    max-width: 700px;
+    margin: 20px auto;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  #commentsSection h3 {
+    margin-bottom: 15px;
+    color: #333;
+  }
+
+  /* Liste de commentaires */
+  #commentsList {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 5px;
+    background: #f5f5f5;
+    border-radius: 10px;
+  }
+
+  /* Bubbles commentaires */
+  .comment-bubble {
+    width: 80%;
+    padding: 8px 12px;
+    margin: 5px 0;
+    border-radius: 15px;
+    word-wrap: break-word;
+    position: relative;
+    clear: both;
+  }
+
+  /* Commentaires autres utilisateurs */
+  .comment-bubble.other {
+    background-color: #ffffff;
+    float: right;
+    text-align: left;
+    align-items: left;
+    justify-content: start;
+    border: 1px solid #ddd;
+  }
+
+  /* Commentaires de l'utilisateur connecté */
+  .comment-bubble.self {
+    background-color: #dcf8c6;
+    text-align: right;
+    align-items: left;
+    justify-content: start;
+    border: 1px solid #b2e2a1;
+  }
+
+  /* Nom d'utilisateur */
+  .comment-bubble .username {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  /* Date commentaire */
+  .comment-bubble .date {
+    font-size: 0.7em;
+    color: #666;
+    display: block;
+    margin-top: 3px;
+  }
+
+  /* Input et bouton */
+  #commentInput {
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    padding: 6px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+
+  #sendCommentBtn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+
+  #sendCommentBtn:hover {
+    background-color: #0056b3;
+  }
+
+  /* Notice message */
+  #commentNotice {
+    font-size: 0.85em;
+    color: red;
+  }
+
+  /* ============================================
+     CATÉGORIE 12 : RÉACTIF (Responsive)
+     ============================================ */
+  @media screen and (max-width: 768px) {
+    .list-item .media-video.youtube iframe,
+    .list-item .media-video video {
+      height: 200px;
+    }
+  }
+}

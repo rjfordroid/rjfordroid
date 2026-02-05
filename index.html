@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+<title>RJFORDROID – Chaine WhatsApp pour apprendre l'informatique Android</title>
+
+<meta name="description" content="RJFORDROID est une chaine WhatsApp dédiée à l’apprentissage de l’informatique sur Android : programmation, astuces, sécurité et formations chaque semaine.">
+
+<meta name="keywords" content="RJFORDROID, chaine WhatsApp informatique, apprendre informatique Android, programmation Android, astuces Android, formation informatique WhatsApp">
+
+<meta name="author" content="RJFORDROID">
+
+<meta name="robots" content="index, follow">
+
+<link rel="canonical" href="https://rjfordroid.netlify.app/chaine/rjfordroid">
+
+<!-- Open Graph -->
+<meta property="og:title" content="RJFORDROID – Apprendre l'informatique sur Android">
+<meta property="og:description" content="Rejoins la chaine WhatsApp RJFORDROID pour apprendre l’informatique sur Android, avec des formations pratiques chaque semaine.">
+<meta property="og:url" content="https://rjfordroid.netlify.app/chaine/rjfordroid">
+<meta property="og:type" content="website">
+<meta property="og:image" content="image.png">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="image.png">
+<meta name="twitter:title" content="RJFORDROID – Informatique Android">
+<meta name="twitter:description" content="Astuces, programmation et formations Android chaque semaine sur WhatsApp.">
+<meta name="twitter:image" content="image.png">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+      <link rel="stylesheet" href="user.css">
+      <link rel="stylesheet" href="rj.css">
+
+</head>
+<body>
+
+<main>
+   <section id="home" class="tab active">
+  <div id="homeContent" style="padding:10px; font-family:'Times New Roman', serif; font-size:14px;">
+    <h2>Bienvenue sur RJFORDROID</h2>
+    <p>📚 Cours informatique sur Android chaque semaine et astuces pour améliorer vos compétences.</p>
+    
+    <!-- Bouton abonne -->
+    <button id="btnSubscribe" style="padding:5px 10px; border:none; border-radius:4px; background:#25D366; color:#fff; cursor:pointer; margin-bottom:10px;">
+      📲 Abonnez-vous à notre chaîne WhatsApp
+    </button>
+
+    <!-- Espas videyo -->
+<div id="videoSpace" style="margin:10px 0; border:1px solid #ccc; border-radius:6px; padding:5px; height:180px; background:#f9f9f9; display:flex; align-items:center; justify-content:center;">
+      🎥 Votre vidéo ici
+    </div>
+
+    <div>
+      <h1 id="homet"></h1>
+      <p id="homes"></p>
+    </div>
+    
+        <!-- Nombre atik nan lis la -->
+  <p class="articleCount">Total d’articles disponibles : <span id="articleCount">0</span></p>
+
+<h3>Mes réseaux sociaux</h3>
+
+<div class="card">
+  <div onclick="window.open('https://www.youtube.com/@RJFORDROID', '_blank')" class="itemCard youtube">
+    <span>YouTube</span>
+    <i class="fa-brands fa-youtube"></i>
+  </div>
+
+  <div onclick="window.open('https://facebook.com/rjfordroid', '_blank')" class="itemCard facebook">
+    <span>Facebook</span>
+    <i class="fa-brands fa-facebook"></i>
+  </div>
+</div>
+<div id="homeCategories" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;"></div>
+  </div>
+
+  
+</section>
+
+  <section id="list" class="tab">
+    <div class="listCategories" style="display:flex;gap:8px;overflow-x:auto;margin-bottom:10px;"></div>
+    <div id="listData"></div>
+
+<div id="detailList" class="hidden">
+  <button id="backBtn">⬅ Back</button>
+  <h2 id="dTitle"></h2>
+  <p style="display:none;" id="dSummary"></p>
+
+  <img id="dImage" />
+  <video id="dVideo" controls></video>
+  <audio id="dAudio" controls></audio>
+
+  <div id="dDescription"></div>
+</div>
+  </section>
+
+<section id="admin" class="tab">
+  <h2><a href="AdmChaine.html">Adm</a></h2>
+
+  <div style="display:flex; flex-direction:column; gap:10px; max-width:400px; margin:20px;">
+    <input type="text" id="t" placeholder="title">
+    <input type="text" id="urlVideo" placeholder="Video ID/URL" style="padding:5px;">
+    <textarea id="s" placeholder="Résumé" style="padding:5px;"></textarea>
+    <label>
+      <input type="checkbox" id="onlineVideo"> Online
+    </label>
+    <button id="btnAddVideo" style="padding:6px 12px; background:#007bff; color:#fff; border:none; border-radius:4px; cursor:pointer;">
+      Ajouter Video
+    </button>
+    <p id="msgVideo" style="color:green; font-weight:bold;"></p>
+  </div>
+
+  <!-- Liste des videos -->
+  <div id="videoList" style="max-width:500px; margin:20px; display:flex; flex-direction:column; gap:10px;"></div>
+</section>
+</main>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="config.js"></script>
+<script src="user.js"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  /* ===============================
+     🔥 Firebase Reference
+  =============================== */
+  const dbVideoRef = firebase.database().ref("RJFORDROID/VIDEO/Home/");
+
+  /* ===============================
+     🔥 DOM Elements
+  =============================== */
+  const titleInput   = document.getElementById("t");
+  const urlInput     = document.getElementById("urlVideo");
+  const summaryInput = document.getElementById("s");
+  const onlineCheckbox = document.getElementById("onlineVideo");
+  const btnAdd = document.getElementById("btnAddVideo");
+  const msgVideo = document.getElementById("msgVideo");
+  const videoList = document.getElementById("videoList");
+
+  let editingId = null;
+
+  /* ===============================
+     🔹 Utils
+  =============================== */
+  function showMessage(text, color = "green") {
+    msgVideo.style.color = color;
+    msgVideo.textContent = text;
+    setTimeout(() => msgVideo.textContent = "", 3000);
+  }
+
+  function resetForm() {
+    titleInput.value = "";
+    urlInput.value = "";
+    summaryInput.value = "";
+    onlineCheckbox.checked = false;
+    editingId = null;
+    btnAdd.textContent = "Ajouter Video";
+    btnAdd.style.background = "#007bff";
+    titleInput.focus();
+  }
+
+  /* ===============================
+     🔹 Add / Update Video
+  =============================== */
+  btnAdd.addEventListener("click", () => {
+    const title = titleInput.value.trim();
+    const url = urlInput.value.trim();
+    const summary = summaryInput.value.trim();
+    const online = onlineCheckbox.checked;
+
+    if (!title || !url) {
+      showMessage("❌ Titre et URL obligatoires", "red");
+      return;
+    }
+
+    const data = {
+      title,
+      url,
+      summary,
+      online,
+      updatedAt: Date.now()
+    };
+
+    if (editingId) {
+      dbVideoRef.child(editingId).update(data).then(() => {
+        showMessage("✅ Vidéo mise à jour");
+        resetForm();
+      });
+    } else {
+      data.createdAt = Date.now();
+      dbVideoRef.push(data).then(() => {
+        showMessage("✅ Vidéo ajoutée");
+        resetForm();
+      });
+    }
+  });
+
+  /* ===============================
+     🔹 Render List
+  =============================== */
+  function renderVideoList(data) {
+    videoList.innerHTML = "";
+
+    if (!data) {
+      videoList.innerHTML = "<p>Aucune vidéo</p>";
+      return;
+    }
+
+    Object.entries(data).reverse().forEach(([id, video]) => {
+      const div = document.createElement("div");
+      div.style.border = "1px solid #ccc";
+      div.style.borderRadius = "8px";
+      div.style.padding = "10px";
+      div.style.background = video.online ? "#eaffea" : "#f9f9f9";
+
+      div.innerHTML = `
+        <h4>${video.title}</h4>
+        <p>${video.summary || ""}</p>
+        <small>${video.url}</small>
+
+        <label>
+          <input type="checkbox" class="onlineChk" ${video.online ? "checked" : ""}>
+          Online
+        </label>
+
+        <div style="display:flex; gap:8px; margin-top:6px;">
+          <button class="editBtn">✏️ Edit</button>
+          <button class="deleteBtn">🗑️ Delete</button>
+        </div>
+      `;
+
+      /* 🔥 EDIT */
+      div.querySelector(".editBtn").addEventListener("click", () => {
+        titleInput.value = video.title || "";
+        urlInput.value = video.url || "";
+        summaryInput.value = video.summary || "";
+        onlineCheckbox.checked = !!video.online;
+
+        editingId = id;
+        btnAdd.textContent = "Mettre à jour";
+        btnAdd.style.background = "#28a745";
+
+        titleInput.scrollIntoView({ behavior: "smooth" });
+        titleInput.focus();
+      });
+
+      /* 🔥 DELETE */
+      div.querySelector(".deleteBtn").addEventListener("click", () => {
+        if (confirm("Supprimer cette vidéo ?")) {
+          dbVideoRef.child(id).remove();
+          showMessage("🗑️ Vidéo supprimée", "orange");
+        }
+      });
+
+      /* 🔥 ONLINE SWITCH */
+      div.querySelector(".onlineChk").addEventListener("change", e => {
+        dbVideoRef.child(id).update({
+          online: e.target.checked,
+          updatedAt: Date.now()
+        });
+      });
+
+      videoList.appendChild(div);
+    });
+  }
+
+  /* ===============================
+     🔹 Firebase Listener
+  =============================== */
+  dbVideoRef.on("value", snap => {
+    renderVideoList(snap.val());
+  });
+
+  /* ===============================
+     🔹 ESC = cancel edit
+  =============================== */
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && editingId) {
+      resetForm();
+      showMessage("❎ Modification annulée", "gray");
+    }
+  });
+
+});
+</script>
+<!-- CONFIGURATION ET FONCTIONNALITÉS PRINCIPALES FIREBASE -->
+
+<script>
+// 👉 Fonction d'initialisation principale qui s'exécute quand la page est chargée
+document.addEventListener("DOMContentLoaded", async function() {
+  
+  // ====================
+  // 1. DÉCLARATION DES ÉLÉMENTS DU DOM
+  // ====================
+  
+  // 📌 Onglets principaux de navigation
+  const tabs = {
+    home: document.getElementById("home"),    // Onglet Accueil
+    list: document.getElementById("list"),    // Onglet Liste des articles
+    admin: document.getElementById("admin")   // Onglet Admin (futur usage)
+  };
+
+  // 📌 Éléments pour afficher les articles et détails
+  const listData = document.getElementById("listData");      // Conteneur de la liste
+  const detailList = document.getElementById("detailList");  // Conteneur des détails
+  const dTitle = document.getElementById("dTitle");          // Titre dans les détails
+  const dSummary = document.getElementById("dSummary");      // Résumé dans les détails
+  const dDescription = document.getElementById("dDescription"); // Description complète
+  const dMedia = document.getElementById('dMedia');          // Conteneur média (détails)
+  const backBtn = document.getElementById("backBtn");        // Bouton retour
+  const articleCountEl = document.getElementById('articleCount'); // Compteur d'articles
+  const listCategoriesEls = document.querySelectorAll(".listCategories"); // Boutons catégories
+
+  // 📌 Référence à la base de données Firebase
+  const dbRef = firebase.database().ref("RJFORDROID/CHAINE/RJfordroid");
+
+  // 📌 Variables globales
+  let ALL_LIST_ITEMS = {};      // Tous les articles chargés
+  let CURRENT_CATEGORY = "ALL"; // Catégorie active
+  let isListLoaded = false;     // Indicateur si la liste est chargée
+
+  // ====================
+  // 2. FONCTION D'INITIALISATION
+  // ====================
+  
+  function initApp() {
+    updateArticleCount(); // Met à jour le compteur d'articles
+
+    // Charge les catégories pour l'onglet Home
+    dbRef.once("value").then(snapshot => {
+      if (snapshot.exists()) {
+        renderHomeCategoryButtons(snapshot.val()); // Affiche les boutons avec icônes
+      }
+    });
+
+    // Vérifie si un ID d'article est présent dans l'URL
+    const params = new URLSearchParams(window.location.search);
+    const idParam = params.get('id');
+
+    if (idParam) {
+      // Si un ID est présent, affiche directement les détails
+      showTab('list');
+      showDetail(idParam);
+    } else {
+      // Sinon affiche l'onglet Accueil par défaut
+      showTab('home');
+    }
+  }
+
+  // ====================
+  // 3. FONCTIONS UTILITAIRES
+  // ====================
+
+  // 🔄 Met à jour le compteur d'articles
+  function updateArticleCount() {
+    dbRef.once("value").then(snapshot => {
+      const data = snapshot.val();
+      const count = data ? Object.keys(data).length : 0;
+      if(articleCountEl) articleCountEl.innerText = count;
+    });
+  }
+
+  // 🎬 Vérifie si une chaîne est une URL YouTube
+  function isYouTubeVideo(value) {
+    return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)/.test(value) 
+           || /^[a-zA-Z0-9_-]{11}$/.test(value);
+  }
+
+  // 🔍 Extrait l'ID YouTube d'une URL ou d'une chaîne
+  function getYouTubeId(value) {
+    if (/^[a-zA-Z0-9_-]{11}$/.test(value)) return value;
+
+    const match = value.match(
+      /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    );
+    return match ? match[1] : null;
+  }
+
+  // ====================
+  // 4. GESTION DES CATÉGORIES
+  // ====================
+
+  // 🏠 Affiche les boutons de catégories dans l'onglet Home
+  function renderHomeCategoryButtons(data) {
+    const categories = new Set();
+    Object.values(data).forEach(item => {
+      if (item.category) categories.add(item.category);
+    });
+
+    let html = `<button onclick="loadListByCategory('Articles')" class="cat-btn active">
+                  📝 Articles
+                </button>`;
+
+    categories.forEach(cat => {
+      // Attribue des icônes selon la catégorie
+      let icon = "📌"; // Icône par défaut
+      if (cat === "Formation") icon = "💻";
+      if (cat === "Articles") icon = "📰";
+      if (cat === "Prompt") icon = "⚡";
+
+      html += `<button onclick="loadListByCategory('${cat}')" class="cat-btn">
+                 ${icon} ${cat}
+               </button>`;
+    });
+
+    const homeEl = document.getElementById("homeCategories");
+    if (homeEl) homeEl.innerHTML = html;
+  }
+
+  // 📋 Affiche les boutons de catégories dans la liste
+  function renderListCategoryButtons(data) {
+    const categories = new Set();
+
+    Object.values(data).forEach(item => {
+      if (item.category) categories.add(item.category);
+    });
+
+    let html = `
+      <button onclick="loadListByCategory('ALL')" class="cat-btn all-btn">
+        Tous
+      </button>
+    `;
+
+    categories.forEach(cat => {
+      html += `
+        <button onclick="loadListByCategory('${cat}')" class="cat-btn">
+          ${cat}
+        </button>
+      `;
+    });
+
+    // Injecte les boutons dans tous les éléments ayant la classe .listCategories
+    listCategoriesEls.forEach(el => {
+      el.innerHTML = html;
+    });
+  }
+
+  // 🌐 Fonction globale pour charger les articles par catégorie
+  window.loadListByCategory = function(category = "ALL") {
+    CURRENT_CATEGORY = category;
+
+    // Change automatiquement vers l'onglet Liste
+    showTab('list');
+
+    // Affiche les articles de la catégorie sélectionnée
+    renderListItems(ALL_LIST_ITEMS);
+
+    // Met à jour l'apparence des boutons de catégorie
+    const btns = document.querySelectorAll('#homeCategories .cat-btn, .listCategories .cat-btn');
+    btns.forEach(btn => btn.classList.remove('active'));
+    btns.forEach(btn => {
+      if(btn.textContent === category || (category === "ALL" && btn.classList.contains('all-btn'))) {
+        btn.classList.add('active');
+      }
+    });
+  };
+
+  // ====================
+  // 5. CHARGEMENT DES ARTICLES
+  // ====================
+
+  // 📥 Charge la liste complète des articles
+  async function loadList() {
+    listData.innerHTML = '<p>Chargement...</p>';
+    
+    try {
+      const snapshot = await dbRef.once("value");
+      const data = snapshot.val();
+
+      if (!data) {
+        listData.innerHTML = "<p>Aucun article trouvé.</p>";
+        return;
+      }
+
+      ALL_LIST_ITEMS = data; // Stocke tous les articles
+
+      // Affiche les boutons de catégories
+      renderListCategoryButtons(data);
+
+      // Définit la catégorie par défaut
+      if (!CURRENT_CATEGORY) {
+        CURRENT_CATEGORY = "Article";
+      }
+
+      // Affiche les articles
+      renderListItems(data);
+      isListLoaded = true;
+
+    } catch (error) {
+      console.error("Erreur de chargement:", error);
+      listData.innerHTML = "<p>Erreur de chargement</p>";
+    }
+  }
+
+  // 🎨 Affiche les articles dans la liste principale
+  function renderListItems(data) {
+    if (!listData) return;
+
+    listData.innerHTML = '';
+
+    const items = Object.entries(data);
+    if (items.length === 0) {
+      listData.innerHTML = "<p>Aucun article trouvé.</p>";
+      return;
+    }
+
+    // Définit les couleurs des badges par catégorie
+    function getCategoryColor(category) {
+      const colors = {
+        Formation: "#28a745",
+        Prompt: "#ffc107",
+        News: "#17a2b8",
+        Autre: "#6c757d"
+      };
+      return colors[category] || "#6c757d";
+    }
+
+    // Parcourt chaque article et crée son élément HTML
+    items.forEach(([id, item]) => {
+      if (CURRENT_CATEGORY !== "ALL" && item.category !== CURRENT_CATEGORY) return;
+
+      const div = document.createElement('div');
+      div.className = "list-item";
+      div.dataset.id = id;
+
+      const category = item.category || "Autre";
+      const categoryColor = getCategoryColor(category);
+
+      // 🔹 GÉNÉRATION DU CONTENU MÉDIA
+      let mediaHtml = "";
+
+      // Image
+      if (item.image) {
+        mediaHtml += `
+          <img src="${item.image}" 
+               class="media-image" 
+               alt="${item.title || ''}">
+        `;
+      }
+
+      // Vidéo
+      if (item.video) {
+        if (isYouTubeVideo(item.video)) {
+          const ytId = getYouTubeId(item.video);
+          if (ytId) {
+            mediaHtml += `
+              <div class="media-video youtube">
+                <iframe
+                  src="https://www.youtube.com/embed/${ytId}"
+                  frameborder="0"
+                  allowfullscreen>
+                </iframe>
+              </div>
+            `;
+          }
+        } else {
+          mediaHtml += `
+            <video class="media-video" controls>
+              <source src="${item.video}">
+            </video>
+          `;
+        }
+      }
+
+      // Audio
+      if (item.audio) {
+        mediaHtml += `
+          <audio class="media-audio" controls>
+            <source src="${item.audio}">
+          </audio>
+        `;
+      }
+
+      // 🔹 HTML COMPLET DE L'ARTICLE
+      div.innerHTML = `
+        <div class="badge-wrapper">
+          <span class="category-badge" style="background:${categoryColor}">
+            ${category}
+          </span>
+        </div>
+
+        <h3>${item.title || "Sans titre"}</h3>
+        ${mediaHtml}
+        <p>${item.summary || ""}</p>
+
+        <div class="actions">
+          <button class="likeBtn">
+            👍 Like <span class="count">${item.likes || 0}</span>
+          </button>
+          <button class="shareBtn">
+            🔗 Partager <span class="count">${item.shares || 0}</span>
+          </button>
+          <button class="detailBtn" data-id="${id}">
+            Voir détails
+          </button>
+        </div>
+      `;
+
+      // ✨ GESTION DES INTERACTIONS
+
+      // Bouton Like
+      div.querySelector(".likeBtn").addEventListener("click", async () => {
+        const newCount = (item.likes || 0) + 1;
+        await dbRef.child(id).update({ likes: newCount });
+        item.likes = newCount;
+        div.querySelector(".likeBtn .count").innerText = newCount;
+      });
+
+      // Bouton Partager
+      div.querySelector(".shareBtn").addEventListener("click", async () => {
+        const newCount = (item.shares || 0) + 1;
+        await dbRef.child(id).update({ shares: newCount });
+        item.shares = newCount;
+        div.querySelector(".shareBtn .count").innerText = newCount;
+        await shareArticle(item, id); // Lance le partage
+      });
+
+      // Bouton Détails
+      div.querySelector(".detailBtn").addEventListener("click", e => {
+        e.preventDefault();
+        e.stopPropagation();
+        showDetail(id);
+        history.pushState(null, "", `?id=${id}`); // Met à jour l'URL
+      });
+
+      listData.appendChild(div);
+    });
+  }
+
+  // ====================
+  // 6. GESTION DES DÉTAILS D'ARTICLE
+  // ====================
+
+  // 🔍 Affiche les détails complets d'un article
+  window.showDetail = async function(firebaseId) {
+    try {
+      const snap = await dbRef.child(firebaseId).once("value");
+      if (!snap.exists()) return;
+
+      const raw = snap.val();
+
+      // Structure les données de l'article
+      const data = {
+        title: raw.title || '',
+        summary: raw.summary || '',
+        description: raw.description || '',
+        image: raw.image || null,
+        video: raw.video || null,
+        audio: raw.audio || null
+      };
+
+      // Affiche les informations textuelles
+      dTitle.textContent = data.title;
+      dSummary.textContent = data.summary;
+      dDescription.innerHTML = data.description;
+
+      // Récupère les éléments média
+      let img   = document.getElementById("dImage");
+      let video = document.getElementById("dVideo");
+      let audio = document.getElementById("dAudio");
+
+      // Réinitialise les médias précédents
+      if (video) video.pause();
+      if (audio) audio.pause();
+
+      img.style.display = "none";
+      video.style.display = "none";
+      audio.style.display = "none";
+
+      img.src = "";
+      video.src = "";
+      audio.src = "";
+
+      // Gestion de la vidéo
+      if (data.video) {
+        if (isYouTubeVideo(data.video)) {
+          const ytId = getYouTubeId(data.video);
+          if (ytId) {
+            video.outerHTML = `
+              <iframe id="dVideo"
+                src="https://www.youtube.com/embed/${ytId}"
+                frameborder="0"
+                allowfullscreen
+                style="width:100%;height:250px">
+              </iframe>
+            `;
+          }
+        } else {
+          video.src = data.video;
+          video.load();
+          video.style.display = "block";
+        }
+      } 
+      // Si pas de vidéo mais une image
+      else if (data.image) {
+        img.src = data.image;
+        img.style.display = "block";
+      }
+
+      // Gestion de l'audio
+      if (data.audio) {
+        audio.src = data.audio;
+        audio.load();
+        audio.style.display = "block";
+      }
+
+      // Affiche la section détails et masque la liste
+      listData.style.display = "none";
+      detailList.style.display = "block";
+
+      // ====================
+      // 7. GESTION DES COMMENTAIRES
+      // ====================
+
+      // Supprime l'ancienne section commentaires si elle existe
+      const oldComments = document.getElementById("commentsSection");
+      if (oldComments) oldComments.remove();
+
+      // Crée la nouvelle section commentaires
+      const commentsSection = document.createElement("div");
+      commentsSection.id = "commentsSection";
+      commentsSection.style.marginTop = "20px";
+      commentsSection.innerHTML = `
+        <h3>💬 Commentaires</h3>
+        <div id="commentsList" style="margin-bottom:10px;"></div>
+        <textarea id="commentInput"
+          placeholder="Écris ton commentaire..."
+          style="width:100%;min-height:60px;"></textarea>
+        <button id="sendCommentBtn" style="margin-top:5px;">Envoyer</button>
+        <p id="commentNotice" style="color:red; margin-top:5px;"></p>
+      `;
+      detailList.appendChild(commentsSection);
+
+      // Récupère les éléments de la section commentaires
+      const commentsList = document.getElementById("commentsList");
+      const commentInput = document.getElementById("commentInput");
+      const sendBtn = document.getElementById("sendCommentBtn");
+      const commentNotice = document.getElementById("commentNotice");
+      const commentsRef = dbRef.child(firebaseId).child("comments");
+
+      // 🔄 Charge et affiche les commentaires existants
+      commentsRef.off(); // Désactive les anciens écouteurs
+      commentsRef.on("value", snap => {
+        commentsList.innerHTML = "";
+        if (!snap.exists()) {
+          commentsList.innerHTML = "<p>Aucun commentaire.</p>";
+          return;
+        }
+
+        // Affiche chaque commentaire
+        snap.forEach(c => {
+          const val = c.val();
+          const div = document.createElement("div");
+
+          // Vérifie si c'est l'utilisateur actuel
+          const isSelf = currentUser && val.user === currentUser.username;
+
+          div.className = isSelf ? "comment-bubble self" : "comment-bubble other";
+
+          const date = new Date(val.date || Date.now());
+          div.innerHTML = `
+            <span class="username">${val.user || "Utilisateur"}</span>
+            <p>${val.text}</p>
+            <span class="date">${date.toLocaleString()}</span>
+          `;
+          commentsList.appendChild(div);
+        });
+      });
+
+      // Vérifie si l'utilisateur est connecté
+      if (!currentUser) {
+        commentInput.disabled = true;
+        sendBtn.disabled = true;
+        commentNotice.textContent = "Connectez-vous pour poster un commentaire.";
+      } else {
+        commentInput.disabled = false;
+        sendBtn.disabled = false;
+        commentNotice.textContent = "";
+
+        // Envoi d'un nouveau commentaire
+        sendBtn.onclick = async () => {
+          const text = commentInput.value.trim();
+          if (!text) return;
+
+          commentsRef.push({
+            text,
+            user: currentUser.username || "Utilisateur",
+            date: Date.now()
+          });
+
+          commentInput.value = ""; // Vide le champ
+        };
+      }
+
+    } catch (err) {
+      console.error("Erreur showDetail:", err);
+    }
+  };
+
+  // ====================
+  // 8. FONCTIONS DE PARTAGE
+  // ====================
+
+  // 🔗 Partage un article
+  async function shareArticle(item, urlId) {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?id=${urlId}`;
+    const shareData = {
+      title: item.title,
+      text: item.summary,
+      url: shareUrl
+    };
+
+    // Utilise l'API Web Share si disponible
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.log("Partage annulé");
+        }
+      }
+    } else {
+      // Fallback: copie dans le presse-papier
+      try {
+        await navigator.clipboard.writeText(`${item.title}\n\n${item.summary}\n\n${shareUrl}`);
+        showPopup("Lien copié ! Partagez-le 🔥");
+      } catch (error) {
+        console.error("Erreur copie:", error);
+      }
+    }
+  }
+
+  // 💬 Affiche un message popup temporaire
+  function showPopup(message) {
+    const popup = document.createElement('div');
+    popup.className = 'popup';
+    popup.textContent = message;
+    popup.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 15px;
+      border-radius: 5px;
+      z-index: 1000;
+    `;
+    
+    document.body.appendChild(popup);
+    
+    setTimeout(() => {
+      popup.remove();
+    }, 3000);
+  }
+
+  // ====================
+  // 9. GESTION DE LA NAVIGATION
+  // ====================
+
+  // ⬅️ Bouton retour à la liste
+  if (backBtn) {
+    backBtn.addEventListener("click", () => {
+      if (detailList) detailList.style.display = 'none';
+      if (listData) {
+        listData.style.display = 'flex';
+        listData.style.flexDirection = 'column';
+      }
+      history.pushState(null, '', window.location.pathname); // Nettoie l'URL
+    });
+  }
+
+  // 📱 Changement d'onglet
+  window.showTab = function(tabName) {
+    if (!tabs[tabName]) return;
+    
+    Object.values(tabs).forEach(t => {
+      if (t) t.classList.remove("active");
+    });
+    
+    tabs[tabName].classList.add("active");
+    
+    if (tabName === 'list') {
+      loadList(); // Charge les articles quand on va dans la liste
+    }
+  }
+
+  // 🔗 Écouteurs pour la navigation principale
+  document.getElementById("btnHome")?.addEventListener("click", () => showTab('home'));
+  document.getElementById("btnList")?.addEventListener("click", () => showTab('list'));
+  document.getElementById("btnAdmin")?.addEventListener("click", () => showTab('admin'));
+
+  // 📱 Bouton d'abonnement WhatsApp
+  document.getElementById("btnSubscribe")?.addEventListener("click", () => {
+    window.open("https://whatsapp.com/channel/0029VadhmlpEAKWIRzYyWt0a", "_blank");
+  });
+
+  // ====================
+  // 10. GESTION DE L'HISTORIQUE
+  // ====================
+
+  // Permet d'utiliser les boutons précédent/suivant du navigateur
+  window.addEventListener('popstate', function() {
+    const params = new URLSearchParams(window.location.search);
+    const idParam = params.get('id');
+    
+    if (!idParam && detailList && detailList.style.display === 'block') {
+      detailList.style.display = 'none';
+      if (listData) {
+        listData.style.display = 'flex';
+        listData.style.flexDirection = 'column';
+      }
+    }
+  });
+
+  // ====================
+  // 11. LANCEMENT DE L'APPLICATION
+  // ====================
+  initApp();
+});
+</script>
+
+<!-- ==================== -->
+<!-- VIDÉO PRINCIPALE HOME -->
+<!-- ==================== -->
+
+<script>
+// 📌 Référence à la vidéo principale dans Firebase
+const videoHomeRef = firebase.database().ref("RJFORDROID/VIDEO/Home/");
+
+// 📌 Éléments du DOM pour la vidéo
+const videoSpace = document.getElementById("videoSpace");
+const homeVideoTitle = document.getElementById("homet");
+const homeVideoSummary = document.getElementById("homes");
+
+// 🔍 Extrait l'ID YouTube d'une URL ou d'une chaîne
+function extractYouTubeId(input){
+  if(!input) return null;
+
+  const regExp = /(?:youtube\.com\/.*v=|youtu\.be\/)([^&]+)/;
+  const match = input.match(regExp);
+  return match ? match[1] : input;
+}
+
+// 🎬 Charge la vidéo principale sur la page d'accueil
+function loadHomeVideo(){
+  videoHomeRef
+    .orderByChild("online")          // Filtre par statut "online"
+    .equalTo(true)                   // Uniquement les vidéos actives
+    .limitToLast(1)                  // La dernière vidéo active
+    .once("value", snapshot => {
+
+      if(!snapshot.exists()){
+        videoSpace.innerHTML = "🎥 Aucune vidéo disponible";
+        return;
+      }
+
+      snapshot.forEach(child => {
+        const v = child.val();
+
+        const videoId = extractYouTubeId(v.url);
+
+        // 🔹 Injection de l'iframe YouTube
+        videoSpace.innerHTML = `
+          <iframe 
+            width="100%" 
+            height="180"
+            src="https://www.youtube.com/embed/${videoId}"
+            frameborder="0"
+            allowfullscreen>
+          </iframe>
+        `;
+
+        // 🔹 Affichage du titre et du résumé
+        homeVideoTitle.innerText = v.title || "";
+        homeVideoSummary.innerText = v.summary || "";
+      });
+    });
+}
+
+// 🚀 Charge la vidéo au démarrage
+loadHomeVideo();
+</script>
+</body>
+</html>

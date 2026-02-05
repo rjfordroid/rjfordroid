@@ -21,6 +21,24 @@
   .hidden { 
     display: none; 
   }
+  
+  .headerHome{
+    background: black;
+    color: white;
+    min-height: 200px;
+    padding: 10px;
+    text-align: center;
+  }
+  .headerHome h2{
+    color: white;
+  }
+  .headerHome button{
+    background: orangered;
+    color: white;
+    padding: 10px;
+    border: none;
+    margin: 10px auto;
+  }
 
   /* ============================================
      CATÉGORIE 3 : PAGE D'ACCUEIL
@@ -29,14 +47,13 @@
     #homeContent {
     font-family: 'Times New Roman', serif;
     font-size: 14px;
-    padding: 1px;
+    padding: 0;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    max-width: 700px;
+    max-width: 100%;
     margin: 2px auto;
   }
-
   #homeContent h2 {
     font-size: 20px;
     color: #333;
@@ -74,13 +91,16 @@
   .card {
     display: flex;
     gap: 15px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   .itemCard {
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
     flex: 1;
-    min-width: 140px;
-    padding: 15px;
+    min-width: 100px;
+    padding: 8px;
     border-radius: 12px;
     color: #fff;
     font-weight: bold;
@@ -108,25 +128,11 @@
     background: linear-gradient(135deg, #1877f2, #0f5dc7);
   }
 
-  /* Bouton abonnement */
-  #btnSubscribe {
-    padding: 10px 15px;
-    height: 50px;
-    border: none;
-    border-radius: 6px;
-    background: #25D366;
-    color: #fff;
-    font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
-    display: block;
-    margin: 10px auto;
-    transition: 0.2s;
+.itemCard.whatsapp {
+    background: linear-gradient(135deg, #25D366, #1ebe57);
   }
 
-  #btnSubscribe:hover {
-    background: #1ebe57;
-  }
+
 
   /* Espace vidéo */
   #videoSpace {
@@ -147,7 +153,7 @@
      CATÉGORIE 4 : GESTION DES CATÉGORIES
      ============================================ */
   /* Container kategori sticky */
-  .listCategories, #homeCategories {
+  .listCategories{
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -162,8 +168,29 @@
   }
 
   #homeCategories {
-    flex-wrap: wrap;
-    margin: 10px 0;
+    margin: 1px 0;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  /* Bouton kategori HOME spécifique */
+  #homeCategories .cat-btn {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    background: none;
+    color: black;
+    border-top: 0;
+    border-bottom: 0;
   }
 
   /* Bouton kategori */
@@ -183,11 +210,6 @@
     gap: 6px;
   }
 
-  /* Bouton kategori HOME spécifique */
-  #homeCategories .cat-btn {
-    background: #f0f0f0;
-    border: 1px solid #ccc;
-  }
 
   /* États des boutons */
   .cat-btn:hover {
@@ -221,31 +243,38 @@
   /* ============================================
      CATÉGORIE 5 : COMPTEUR D'ARTICLES
      ============================================ */
+     .flex{
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 15px;
+  background: black;
+  margin: 0;
+}
   .articleCount {
     width: 98%;
     font-weight: 700;
-    color: #1f7a4d;
-    background: #dff5ea;
+    color: white;
+    background: none;
     padding: 10px;
     border-radius: 10px;
     margin: 10px auto;
     display: inline-block;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    box-shadow: 0;
     animation: pulseBadge 2.5s ease-in-out infinite;
   }
 
   @keyframes pulseBadge {
     0% {
       transform: scale(1);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+     color: green;
     }
     50% {
       transform: scale(1.05);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+      color: blue;
     }
     100% {
       transform: scale(1);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      color: orangered;
     }
   }
 

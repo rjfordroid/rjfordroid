@@ -3,9 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4800728968697075"
+     crossorigin="anonymous"></script>
+
 <link rel="stylesheet" href="style.css">
 <title>RJFORDROID – Chaine WhatsApp pour apprendre l'informatique Android</title>
 
+<meta name="google-adsense-account" content="ca-pub-4800728968697075">
 <meta name="description" content="RJFORDROID est une chaine WhatsApp dédiée à l’apprentissage de l’informatique sur Android : programmation, astuces, sécurité et formations chaque semaine.">
 
 <meta name="keywords" content="RJFORDROID, chaine WhatsApp informatique, apprendre informatique Android, programmation Android, astuces Android, formation informatique WhatsApp">
@@ -37,15 +42,13 @@
 
 <main>
    <section id="home" class="tab active">
-  <div id="homeContent" style="padding:10px; font-family:'Times New Roman', serif; font-size:14px;">
-    <h2>Bienvenue sur RJFORDROID</h2>
-    <p>📚 Cours informatique sur Android chaque semaine et astuces pour améliorer vos compétences.</p>
-    
-    <!-- Bouton abonne -->
-    <button id="btnSubscribe" style="padding:5px 10px; border:none; border-radius:4px; background:#25D366; color:#fff; cursor:pointer; margin-bottom:10px;">
-      📲 Abonnez-vous à notre chaîne WhatsApp
-    </button>
-
+     <div id="homeCategories"></div>
+     <div class="headerHome">
+         <h2>RJFORDROID</h2>
+    <p>Cours informatique sur Android chaque semaine et astuces pour améliorer vos compétences.</p>
+    <button class="download">Télécharger RJFORDROID</button>
+     </div>
+  <div id="homeContent" style="font-family:'Times New Roman', serif; font-size:14px;">
     <!-- Espas videyo -->
 <div id="videoSpace" style="margin:10px 0; border:1px solid #ccc; border-radius:6px; padding:5px; height:180px; background:#f9f9f9; display:flex; align-items:center; justify-content:center;">
       🎥 Votre vidéo ici
@@ -57,7 +60,19 @@
     </div>
     
         <!-- Nombre atik nan lis la -->
-  <p class="articleCount">Total d’articles disponibles : <span id="articleCount">0</span></p>
+        <div class="flex">
+          <p class="articleCount"><span>Artickes</span>
+          </br>
+          <span id="articleCount">0</span></p>
+          
+          <p class="articleCount"><span>Users</span>
+          </br>
+          <span id="userCount">0</span></p>
+          
+          <p class="articleCount"><span>Livres</span>
+          </br>
+          <span id="livreCount">0</span></p>
+        </div>
 
 <h3>Mes réseaux sociaux</h3>
 
@@ -71,8 +86,15 @@
     <span>Facebook</span>
     <i class="fa-brands fa-facebook"></i>
   </div>
+  
+  <!-- Bouton abonne -->
+    <div class="itemCard whatsapp" id="btnSubscribe">
+          <span>Whatsapp</span>
+        
+    <i class="fa-brands fa-whatsapp"></i>
+    </div>
 </div>
-<div id="homeCategories" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;"></div>
+
   </div>
 
   

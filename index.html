@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-58748S9Z');</script>
+<!-- End Google Tag Manager -->
+
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4800728968697075"
      crossorigin="anonymous"></script>
 
@@ -39,6 +47,10 @@
 
 </head>
 <body>
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-58748S9Z"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
 <main>
    <section id="home" class="tab active">
@@ -336,10 +348,13 @@ document.addEventListener("DOMContentLoaded", async function() {
   const dMedia = document.getElementById('dMedia');          // Conteneur média (détails)
   const backBtn = document.getElementById("backBtn");        // Bouton retour
   const articleCountEl = document.getElementById('articleCount'); // Compteur d'articles
+  
+  const userCountEl = document.getElementById('userCount'); // Compteur d'articles
   const listCategoriesEls = document.querySelectorAll(".listCategories"); // Boutons catégories
 
   // 📌 Référence à la base de données Firebase
   const dbRef = firebase.database().ref("RJFORDROID/CHAINE/RJfordroid");
+const dbRefUser = firebase.database().ref("RJFORDROID/USERS");
 
   // 📌 Variables globales
   let ALL_LIST_ITEMS = {};      // Tous les articles chargés
@@ -352,6 +367,7 @@ document.addEventListener("DOMContentLoaded", async function() {
   
   function initApp() {
     updateArticleCount(); // Met à jour le compteur d'articles
+    updateUsersCount();
 
     // Charge les catégories pour l'onglet Home
     dbRef.once("value").then(snapshot => {
@@ -384,6 +400,15 @@ document.addEventListener("DOMContentLoaded", async function() {
       const data = snapshot.val();
       const count = data ? Object.keys(data).length : 0;
       if(articleCountEl) articleCountEl.innerText = count;
+    });
+  }
+  
+    // 🔄 Met à jour le compteur users
+  function updateUsersCount() {
+    dbRefUser.once("value").then(snapshot => {
+      const data = snapshot.val();
+      const count = data ? Object.keys(data).length : 0;
+      if(userCountEl) userCountEl.innerText = count;
     });
   }
 

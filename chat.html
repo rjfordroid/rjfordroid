@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natcom - Chat Premium</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 85vh;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 100, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chatheader {
+            background: linear-gradient(to right, #0066cc, #0099ff);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        
+        .user-credits {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .credits-amount {
+            background-color: white;
+            color: #0066cc;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .buy-credits-btn {
+            background-color: #ffcc00;
+            color: #333;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 12px;
+        }
+        
+        .buy-credits-btn:hover {
+            background-color: #ffd633;
+            transform: scale(1.05);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #ff4757;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+            display: none;
+        }
+        
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0066cc;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .company-info h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .company-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #4cff4c;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        .chat-area {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .message {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-client {
+            align-self: flex-end;
+            background-color: #0066cc;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message-agent {
+            align-self: flex-start;
+            background-color: #f0f5ff;
+            color: #333;
+            border-bottom-left-radius: 5px;
+            border: 1px solid #e1e8f0;
+        }
+        
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .sender-name {
+            font-weight: 600;
+        }
+        
+        .message-time {
+            opacity: 0.8;
+            font-size: 12px;
+        }
+        
+        .message-agent .message-time {
+            color: #666;
+        }
+        
+        .message-client .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .welcome-message {
+            background-color: #f8fbff;
+            border: 2px dashed #c2ddff;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-message h3 {
+            color: #0066cc;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .welcome-message p {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        .input-area {
+            padding: 20px 30px;
+            border-top: 1px solid #eaeaea;
+            background-color: #fafcff;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e1e8f0;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .message-input:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        .send-button {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: linear-gradient(to right, #0066cc, #0099ff);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .send-button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 102, 204, 0.3);
+        }
+        
+        .send-button:disabled {
+            background: linear-gradient(to right, #cccccc, #999999);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .client-info {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 10px;
+            font-size: 14px;
+            border-left: 4px solid #0066cc;
+        }
+        
+        .client-info strong {
+            color: #0066cc;
+        }
+        
+        .message-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-button {
+            padding: 8px 15px;
+            background-color: #e6f0ff;
+            border: 1px solid #c2ddff;
+            border-radius: 20px;
+            color: #0066cc;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-button:hover {
+            background-color: #d1e4ff;
+        }
+        
+        .attachment-button {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background-color: #f0f5ff;
+            border: 2px solid #e1e8f0;
+            color: #0066cc;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .attachment-button:hover {
+            background-color: #e6f0ff;
+        }
+        
+        /* Notification toast */
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #0066cc;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            max-width: 350px;
+        }
+        
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+        
+        .notification-toast i {
+            font-size: 20px;
+        }
+        
+        .notification-content h4 {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        
+        .notification-content p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* Modal d'achat de crédits */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            display: none;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            color: #0066cc;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .credit-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .credit-option {
+            border: 2px solid #e1e8f0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .credit-option:hover {
+            border-color: #0066cc;
+            transform: translateY(-5px);
+        }
+        
+        .credit-option.selected {
+            border-color: #0066cc;
+            background-color: #f0f8ff;
+        }
+        
+        .credit-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+        
+        .credit-price {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .credit-bonus {
+            font-size: 12px;
+            color: #ff6600;
+            margin-top: 5px;
+        }
+        
+        .buy-now-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, #0066cc, #0099ff);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .buy-now-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 102, 204, 0.2);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 90vh;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .user-credits {
+                align-self: flex-end;
+            }
+            
+            .chat-area {
+                padding: 15px;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+            
+            .input-area {
+                padding: 15px;
+            }
+            
+            .notification-toast {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: calc(100% - 20px);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .company-info h1 {
+                font-size: 20px;
+            }
+            
+            .message {
+                max-width: 90%;
+                padding: 12px 15px;
+            }
+            
+            .credit-options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animation pour nouveau message */
+        @keyframes highlight {
+            0% { background-color: rgba(255, 255, 200, 0.5); }
+            100% { background-color: transparent; }
+        }
+        
+        .new-message {
+            animation: highlight 2s ease-out;
+        }
+        
+        .cost-indicator {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            text-align: right;
+        }
+    </style>
+    
+</head>
+<body>
+  <main>
+     <!-- Modal d'achat de crédits -->
+    <div class="modal-overlay" id="creditModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Acheter des Crédits</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="credit-options">
+                <div class="credit-option" data-credits="10" data-price="1.99">
+                    <div class="credit-amount">10 crédits</div>
+                    <div class="credit-price">1.99 €</div>
+                    <div class="credit-bonus">Idéal pour débuter</div>
+                </div>
+                
+                <div class="credit-option selected" data-credits="25" data-price="3.99">
+                    <div class="credit-amount">25 crédits</div>
+                    <div class="credit-price">3.99 €</div>
+                    <div class="credit-bonus">+5 crédits bonus!</div>
+                </div>
+                
+                <div class="credit-option" data-credits="60" data-price="7.99">
+                    <div class="credit-amount">60 crédits</div>
+                    <div class="credit-price">7.99 €</div>
+                    <div class="credit-bonus">Meilleure valeur!</div>
+                </div>
+                
+                <div class="credit-option" data-credits="150" data-price="14.99">
+                    <div class="credit-amount">150 crédits</div>
+                    <div class="credit-price">14.99 €</div>
+                    <div class="credit-bonus">+50 crédits bonus!</div>
+                </div>
+            </div>
+            
+            <button class="buy-now-btn" id="confirmPurchase">
+                <i class="fas fa-shopping-cart"></i> Acheter Maintenant
+            </button>
+        </div>
+    </div>
+    
+    <!-- Notification toast -->
+    <div class="notification-toast" id="notificationToast">
+        <i class="fas fa-comment-dots"></i>
+        <div class="notification-content">
+            <h4 id="toastTitle">Nouveau message</h4>
+            <p id="toastMessage">Vous avez reçu un nouveau message</p>
+        </div>
+    </div>
+    
+    <div class="chat-container">
+        <!-- Header avec logo et statut -->
+        <div class="header">
+            <div class="notification-badge" id="notificationBadge">1</div>
+            <div class="logo-area">
+                <div class="logo">N</div>
+                <div class="company-info">
+                    <h1>Natcom Premium</h1>
+                    <p>Service client premium</p>
+                </div>
+            </div>
+            
+            <div class="user-credits">
+                <span>Crédits:</span>
+                <div class="credits-amount">
+                    <i class="fas fa-coins"></i>
+                    <span id="creditsDisplay">0</span>
+                </div>
+                <button class="buy-credits-btn" id="openCreditModal">+ Acheter</button>
+            </div>
+            
+            <div class="status">
+                <div class="status-indicator"></div>
+                <span>Support en ligne</span>
+            </div>
+        </div>
+        
+        <!-- Zone de conversation -->
+        <div class="chat-area" id="chatArea">
+            <!-- Message de bienvenue -->
+            <div class="welcome-message">
+                <h3>Byenvini nan sèvis premium Natcom</h3>
+                <p>Chattez avec nos agents en temps réel! Chaque message coûte 1 crédit. Vous avez actuellement <strong id="welcomeCredits">0 crédits</strong>.</p>
+            </div>
+        </div>
+        
+        <!-- Zone de saisie -->
+        <div class="input-area">
+            <button class="attachment-button" id="attachBtn">
+                <i class="fas fa-paperclip"></i>
+            </button>
+            <input type="text" class="message-input" id="messageInput" placeholder="Tapez votre message ici (1 crédit par message)...">
+            <button class="send-button" id="sendBtn" disabled>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+        <div class="cost-indicator" id="costIndicator">Coût: 1 crédit | Crédits restants: <span id="remainingCredits">0</span></div>
+    </div>
+  </main>
+<script src="config.js"></script>
+<script src="chat.js"></script>
+<script>
+/* ================= FIREBASE CONFIG ================= */
+const auth = firebase.auth();
+
+/* ================= GLOBAL STATE ================= */
+let userId = null;
+let userRole = "client"; // client | agent
+let userCredits = 0;
+
+let messagesRef = database.ref("chats/natcom/messages");
+let userRef = null;
+
+/* ================= DOM ================= */
+const chatArea = document.getElementById("chatArea");
+const messageInput = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
+const creditsDisplay = document.getElementById("creditsDisplay");
+const welcomeCredits = document.getElementById("welcomeCredits");
+const remainingCredits = document.getElementById("remainingCredits");
+const openCreditModal = document.getElementById("openCreditModal");
+const costIndicator = document.getElementById("costIndicator");
+
+/* ================= AUTH ================= */
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    await auth.signInAnonymously();
+    return;
+  }
+
+  userId = user.uid;
+  userRef = database.ref("users/" + userId);
+
+  const snap = await userRef.once("value");
+
+  if (!snap.exists()) {
+    await userRef.set({
+      credits: 5,
+      isAdmin: false,
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    });
+  }
+
+  userRef.on("value", (s) => {
+    const data = s.val();
+    userCredits = Number(data.credits || 0);
+    userRole = data.isAdmin ? "agent" : "client";
+    updateCreditsDisplay();
+    applyRoleUI();
+  });
+
+  listenMessages();
+});
+
+/* ================= UI ================= */
+function applyRoleUI() {
+  if (userRole === "agent") {
+    creditsDisplay.textContent = "∞";
+    welcomeCredits.textContent = "illimités";
+    remainingCredits.textContent = "∞";
+    openCreditModal.style.display = "none";
+    costIndicator.style.display = "none";
+    sendBtn.disabled = false;
+    messageInput.placeholder = "Répondre au client...";
+  }
+}
+
+function updateCreditsDisplay() {
+  if (userRole === "agent") return;
+
+  creditsDisplay.textContent = userCredits;
+  welcomeCredits.textContent = userCredits + " crédits";
+  remainingCredits.textContent = userCredits;
+  sendBtn.disabled = userCredits <= 0;
+}
+
+/* ================= CHAT ================= */
+function listenMessages() {
+  messagesRef.limitToLast(50).on("child_added", (snap) => {
+    const msg = snap.val();
+    displayMessage(msg);
+  });
+}
+
+function displayMessage(msg) {
+  const div = document.createElement("div");
+  const mine = msg.userId === userId;
+
+  div.className = `message ${mine ? "message-client" : "message-agent"}`;
+  const time = new Date(msg.timestamp || Date.now()).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  div.innerHTML = `
+    <div class="message-header">
+      <span class="sender-name">${msg.sender}</span>
+      <span class="message-time">${time}</span>
+    </div>
+    <div>${msg.content}</div>
+  `;
+
+  chatArea.appendChild(div);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+/* ================= SEND ================= */
+function sendMessage() {
+  const content = messageInput.value.trim();
+  if (!content) return;
+
+  if (userRole === "client") {
+    if (userCredits <= 0) return alert("❌ Plus de crédits");
+    userCredits--;
+    userRef.child("credits").set(userCredits);
+  }
+
+  messagesRef.push({
+    userId,
+    sender: userRole === "agent" ? "Agent Natcom" : "Client",
+    content,
+    type: userRole,
+    timestamp: firebase.database.ServerValue.TIMESTAMP
+  });
+
+  messageInput.value = "";
+}
+
+/* ================= EVENTS ================= */
+sendBtn.onclick = sendMessage;
+messageInput.addEventListener("keypress", e => {
+  if (e.key === "Enter") sendMessage();
+});
+</script>
+</body>
+</html>

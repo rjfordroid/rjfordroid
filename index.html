@@ -44,6 +44,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
       <link rel="stylesheet" href="user.css">
       <link rel="stylesheet" href="rj.css">
+      <link rel="stylesheet" href="chat.css">
 
 </head>
 <body>
@@ -128,6 +129,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div id="dDescription"></div>
 </div>
   </section>
+  
+ <!-- CHAT SECTION -->
+<section id="chat" class="tab">
+  <div class="chat-sidebar-toggle">
+    <button id="toggleClientsBtn">Clients 👥</button>
+  </div>
+
+  <div class="chat-wrapper">
+    <!-- LISTE CLIENTS (Sidebar) -->
+    <div class="chatClientEtAdm sidebar"></div>
+
+    <!-- CHAT CONTAINER -->
+    <div class="chat-container">
+      <div class="chat-area" id="chatArea">
+        <div class="welcome-message">
+          <h3>Byenvini nan sèvis premium Natcom</h3>
+          <p>Chattez avec nos agents en temps réel! Chaque message coûte 1 crédit. Vous avez actuellement <strong id="welcomeCredits">0 crédits</strong>.</p>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <button class="attachment-button" id="attachBtn"><i class="fas fa-paperclip"></i></button>
+        <input type="text" class="message-input" id="messageInput" placeholder="Tapez votre message ici (1 crédit par message)...">
+        <button class="send-button" id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
+      </div>
+      <div class="cost-indicator" id="costIndicator">Coût: 1 crédit | Crédits restants: <span id="remainingCredits">0</span></div>
+    </div>
+  </div>
+</section>
 
 <section id="admin" class="tab">
   <h2><a href="AdmChaine.html">Adm</a></h2>
@@ -155,6 +185,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script src="config.js"></script>
 <script src="user.js"></script>
+<script src="chat.js"></script>
 
 
 <script>
@@ -335,7 +366,8 @@ document.addEventListener("DOMContentLoaded", async function() {
   // 📌 Onglets principaux de navigation
   const tabs = {
     home: document.getElementById("home"),    // Onglet Accueil
-    list: document.getElementById("list"),    // Onglet Liste des articles
+    list: document.getElementById("list"),
+    chat: document.getElementById("chat"),// Onglet Liste des articles
     admin: document.getElementById("admin")   // Onglet Admin (futur usage)
   };
 
@@ -939,6 +971,7 @@ const dbRefUser = firebase.database().ref("RJFORDROID/USERS");
   // 🔗 Écouteurs pour la navigation principale
   document.getElementById("btnHome")?.addEventListener("click", () => showTab('home'));
   document.getElementById("btnList")?.addEventListener("click", () => showTab('list'));
+  document.getElementById("btnChat")?.addEventListener("click", () => showTab('chat'));
   document.getElementById("btnAdmin")?.addEventListener("click", () => showTab('admin'));
 
   // 📱 Bouton d'abonnement WhatsApp

@@ -378,6 +378,7 @@ function loadMainFooter() {
    <header class="tabs">
     <button id="btnHome">Home</button>
     <button id="btnList">A Lire</button>
+    <button id="btnChat">Chat</button>
     <button id="btnLogout" onclick="logout()">Logout</button>
     <button id="btnConect" onclick="conect()">Connectez</button>
     <button id="btnAdmin">Admin</button>

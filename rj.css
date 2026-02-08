@@ -613,3 +613,108 @@
     }
   }
 }
+
+
+
+@media all{
+  /* ===== GLOBAL STATS CONTAINER ===== */
+#statsContainer {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 16px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ===== TITRES ===== */
+#statsContainer h2 {
+  font-size: 1.6rem;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+#statsContainer h3 {
+  margin-top: 24px;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+  border-left: 4px solid #4caf50;
+  padding-left: 8px;
+}
+
+/* ===== LISTES ===== */
+#statsContainer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ===== ITEMS GÉNÉRAUX ===== */
+#statsContainer li {
+  background: #f6f7f9;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#statsContainer li:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* ===== ONLINE ===== */
+#statsListUserOnline li {
+  background: linear-gradient(135deg, #e8fbe9, #dff6e0);
+  font-weight: 600;
+  color: #1b7a2a;
+}
+
+/* ===== PAYS ===== */
+#statsListPays li {
+  border-left: 4px solid #2196f3;
+}
+
+/* ===== PAGES ===== */
+#statsListPages li {
+  border-left: 4px solid #ff9800;
+}
+
+/* ===== NAVIGATEURS ===== */
+#statsListBrowsers li {
+  justify-content: space-between;
+  font-weight: 500;
+}
+
+/* ===== BADGES NAVIGATEURS ===== */
+.browser-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Couleurs par navigateur */
+.browser-Chrome { background: #fbbc05; color:#000; }
+.browser-Firefox { background: #ff7139; }
+.browser-Safari { background: #0fb9b1; }
+.browser-Edge { background: #0a59f7; }
+.browser-Opera { background: #ff1b2d; }
+.browser-Autre { background: #9e9e9e; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  #statsContainer {
+    padding: 10px;
+  }
+
+  #statsContainer li {
+    font-size: 0.9rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+}

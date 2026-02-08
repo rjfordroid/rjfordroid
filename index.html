@@ -177,6 +177,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <!-- Liste des videos -->
   <div id="videoList" style="max-width:500px; margin:20px; display:flex; flex-direction:column; gap:10px;"></div>
+  
+
+<div id="statsContainer" class="stats-container">
+  <h2>📊 Statistiques en temps réel</h2>
+  
+  <section>
+    <h3>🌍 Pays</h3>
+    <ul id="statsListPays" class="stats-list"></ul>
+  </section>
+  
+  <section>
+    <h3>📄 Pages les plus visitées</h3>
+    <ul id="statsListPages" class="stats-list"></ul>
+  </section>
+  
+  <section>
+    <h3>🟢 Utilisateurs en ligne</h3>
+    <ul id="statsListUserOnline" class="stats-list"></ul>
+  </section>
+  
+  <section>
+    <h3>🧭 Navigateurs</h3>
+    <ul id="statsListBrowsers" class="stats-list"></ul>
+  </section>
+</div>
 </section>
 </main>
 
@@ -186,6 +211,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script src="config.js"></script>
 <script src="user.js"></script>
 <script src="chat.js"></script>
+<script src="visite.js"></script>
 
 
 <script>
@@ -397,31 +423,37 @@ const dbRefUser = firebase.database().ref("RJFORDROID/USERS");
   // 2. FONCTION D'INITIALISATION
   // ====================
   
-  function initApp() {
-    updateArticleCount(); // Met à jour le compteur d'articles
-    updateUsersCount();
+ function initApp() {
+  updateArticleCount();
+  updateUsersCount();
 
-    // Charge les catégories pour l'onglet Home
-    dbRef.once("value").then(snapshot => {
-      if (snapshot.exists()) {
-        renderHomeCategoryButtons(snapshot.val()); // Affiche les boutons avec icônes
-      }
-    });
-
-    // Vérifie si un ID d'article est présent dans l'URL
-    const params = new URLSearchParams(window.location.search);
-    const idParam = params.get('id');
-
-    if (idParam) {
-      // Si un ID est présent, affiche directement les détails
-      showTab('list');
-      showDetail(idParam);
-    } else {
-      // Sinon affiche l'onglet Accueil par défaut
-      showTab('home');
+  // Charger catégories Home
+  dbRef.once("value").then(snapshot => {
+    if (snapshot.exists()) {
+      renderHomeCategoryButtons(snapshot.val());
     }
-  }
+  });
 
+  // 🔗 Lecture URL
+  const params   = new URLSearchParams(window.location.search);
+  const tabParam = params.get("tab");
+  const idParam  = params.get("id");
+
+  // 🧠 Priorité logique
+  if (idParam) {
+    // Article précis → liste + détail
+    showTab("list");
+    showDetail(idParam);
+  }
+  else if (tabParam && tabs[tabParam]) {
+    // Tab demandé
+    showTab(tabParam);
+  }
+  else {
+    // Défaut
+    showTab("home");
+  }
+}
   // ====================
   // 3. FONCTIONS UTILITAIRES
   // ====================
@@ -791,7 +823,7 @@ const dbRefUser = firebase.database().ref("RJFORDROID/USERS");
       // Affiche la section détails et masque la liste
       listData.style.display = "none";
       detailList.style.display = "block";
-
+       saveVisit(firebaseId);
       // ====================
       // 7. GESTION DES COMMENTAIRES
       // ====================
@@ -954,19 +986,26 @@ const dbRefUser = firebase.database().ref("RJFORDROID/USERS");
   }
 
   // 📱 Changement d'onglet
-  window.showTab = function(tabName) {
-    if (!tabs[tabName]) return;
-    
-    Object.values(tabs).forEach(t => {
-      if (t) t.classList.remove("active");
-    });
-    
-    tabs[tabName].classList.add("active");
-    
-    if (tabName === 'list') {
-      loadList(); // Charge les articles quand on va dans la liste
-    }
+window.showTab = function(tabName) {
+  if (!tabs[tabName]) return;
+
+  // Cache tous les tabs
+  Object.values(tabs).forEach(t => t.classList.remove("active"));
+
+  // Active le bon tab
+  tabs[tabName].classList.add("active");
+
+  // 🔗 Met à jour l’URL
+ const currentTab = new URLSearchParams(location.search).get("tab");
+
+if (currentTab !== tabName) {
+  history.pushState(null, "", `?tab=${tabName}`);
+}
+  // Actions spécifiques
+  if (tabName === 'list') {
+    loadList();
   }
+};
 
   // 🔗 Écouteurs pour la navigation principale
   document.getElementById("btnHome")?.addEventListener("click", () => showTab('home'));
@@ -984,6 +1023,11 @@ const dbRefUser = firebase.database().ref("RJFORDROID/USERS");
   // ====================
 
   // Permet d'utiliser les boutons précédent/suivant du navigateur
+  window.addEventListener("popstate", () => {
+  const params = new URLSearchParams(window.location.search);
+  const tab = params.get("tab") || "home";
+  showTab(tab);
+});
   window.addEventListener('popstate', function() {
     const params = new URLSearchParams(window.location.search);
     const idParam = params.get('id');

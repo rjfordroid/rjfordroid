@@ -718,3 +718,32 @@
   }
 }
 }
+
+
+
+/* Tout atab yo kache pa default */
+.atab {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Atab aktif */
+.atab.active {
+  display: block;
+}
+
+/* Buttons style */
+.atabbtn button {
+  padding: 6px 12px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #eee;
+}
+
+.atabbtn button.activeBtn {
+  background: #007bff;
+  color: #fff;
+}

@@ -161,8 +161,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <section id="admin" class="tab">
   <h2><a href="AdmChaine.html">Adm</a></h2>
+<div class="atabbtn">
+  <button id="toggleClientsBtns">Client</button>
+  <button data-target="tabApp">App</button>
+  <button data-target="tabVideos">Videos</button>
+  <button data-target="tabPays">Pays</button>
+  <button data-target="tabPages">Pages</button>
+  <button data-target="tabOnline">Online</button>
+  <button data-target="tabBrowsers">Browser</button>
+</div>
 
-  <div style="display:flex; flex-direction:column; gap:10px; max-width:400px; margin:20px;">
+<div id="statsContainer" class="stats-container">
+  <h2>📊 Statistiques en temps réel</h2>
+
+  <div class="atab" id="tabApp" style="display:flex; flex-direction:column; gap:10px; max-width:400px; margin:20px;">
     <input type="text" id="t" placeholder="title">
     <input type="text" id="urlVideo" placeholder="Video ID/URL" style="padding:5px;">
     <textarea id="s" placeholder="Résumé" style="padding:5px;"></textarea>
@@ -175,34 +187,78 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <p id="msgVideo" style="color:green; font-weight:bold;"></p>
   </div>
 
-  <!-- Liste des videos -->
-  <div id="videoList" style="max-width:500px; margin:20px; display:flex; flex-direction:column; gap:10px;"></div>
-  
+  <div class="atab" id="tabVideos" style="max-width:500px; margin:20px; display:flex; flex-direction:column; gap:10px;">
+    <div id="videoList"></div>
+  </div>
 
-<div id="statsContainer" class="stats-container">
-  <h2>📊 Statistiques en temps réel</h2>
-  
-  <section>
+  <div class="atab" id="tabPays">
     <h3>🌍 Pays</h3>
     <ul id="statsListPays" class="stats-list"></ul>
-  </section>
+  </div>
   
-  <section>
+  <div class="atab" id="tabPages">
     <h3>📄 Pages les plus visitées</h3>
     <ul id="statsListPages" class="stats-list"></ul>
-  </section>
+  </div>
   
-  <section>
+  <div class="atab" id="tabOnline">
     <h3>🟢 Utilisateurs en ligne</h3>
     <ul id="statsListUserOnline" class="stats-list"></ul>
-  </section>
+  </div>
   
-  <section>
+  <div class="atab" id="tabBrowsers">
     <h3>🧭 Navigateurs</h3>
     <ul id="statsListBrowsers" class="stats-list"></ul>
-  </section>
+  </div>
 </div>
+
+<script>
+const tabButtons = document.querySelectorAll('.atabbtn button');
+const tabs = document.querySelectorAll('.atab');
+
+tabButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    // Retire active sou tout bouton
+    tabButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Kache tout tab
+    tabs.forEach(t => {
+      t.classList.remove('active');
+      t.style.display = 'none';
+    });
+
+    // Montre tab ki koresponn ak data-target
+    const targetId = btn.dataset.target;
+    const targetTab = document.getElementById(targetId);
+    if(targetTab) {
+      targetTab.style.display = 'flex';
+      targetTab.classList.add('active');
+    }
+  });
+});
+
+// Inisyalize premye tab kòm aktif
+if(tabButtons.length > 0) tabButtons[0].click();
+</script>
+
+<style>
+.atabbtn button.active {
+  background-color: #007bff;
+  color: #fff;
+}
+.atabbtn button {
+  padding: 6px 12px;
+  margin-right: 5px;
+  cursor: pointer;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  background: #fff;
+  color: #007bff;
+}
+</style>
 </section>
+
 </main>
 
 <!-- Firebase -->

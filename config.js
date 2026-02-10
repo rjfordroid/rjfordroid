@@ -377,7 +377,8 @@ function loadMainFooter() {
   footer.innerHTML = `
    <header class="tabs">
     <button id="btnHome">Home</button>
-    <button id="btnList">A Lire</button>
+    <button id="btnCours">Cours</button>
+    <button id="btnList">Blog</button>
     <button id="btnChat">Chat</button>
     <button id="btnLogout" onclick="logout()">Logout</button>
     <button id="btnConect" onclick="conect()">Connectez</button>
@@ -501,3 +502,20 @@ document.addEventListener("DOMContentLoaded", () => {
   verifierConnexion();   // 5️⃣ Verifye si itilizatè konekte
   // displayConnectedUser() ap kouri anndan verifierConnexion() si itilizatè konekte
 });
+
+
+
+
+
+/* ================================
+   GET VISITOR COUNTRY
+================================ */
+async function getCountry() {
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+    return data.country_name || "Unknown";
+  } catch (e) {
+    return "Unknown";
+  }
+}

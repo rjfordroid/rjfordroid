@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture du Cours - AYIWEB</title>
+
+<style>
+:root{--primary:#2563eb;--dark:#1e293b;--light-bg:#f8fafc;--sidebar-bg:#0f172a}
+body{font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;margin:0;display:flex;height:100vh;overflow:hidden;background:var(--light-bg)}
+#lesson-content,#lesson-content *{margin-top:0!important;padding-top:0!important}
+#lesson-content p,#lesson-content h1,#lesson-content h2{margin-bottom:12px!important;line-height:1.6!important}
+.navigation-container{display:flex;justify-content:center;margin:30px auto;max-width:900px}
+.next-btn{background:var(--primary);color:#fff;border:none;padding:12px 32px;border-radius:6px;cursor:pointer;font-weight:600}
+.next-btn:disabled{background:#94a3b8;cursor:not-allowed}
+.sidebar{width:320px;background:var(--sidebar-bg);color:#fff;display:flex;flex-direction:column;transition:.3s}
+.sidebar-header{padding:20px;background:#1e293b}
+.lesson-item{padding:15px;border-bottom:1px solid #1e293b;cursor:pointer}
+.lesson-item:hover{background:#1e293b}
+.active-lesson{background:var(--primary)!important;font-weight:bold}
+.main-content{flex:1;overflow-y:auto}
+.video-wrapper{background:#000}
+iframe{width:100%;aspect-ratio:16/9;border:none;display:block}
+.content-text{padding:20px;max-width:900px;margin:auto}
+.progress-bar-bg{background:#1e293b;border-radius:20px;height:10px}
+.progress-bar{height:100%;background:#22c55e;width:0}
+
+/* --- MOBILE --- */
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%);z-index:1150}
+  .sidebar.open{transform:translateX(0)}
+  #menu-btn{display:block;position:fixed;bottom:20px;right:20px;z-index:1200;background:var(--primary);color:#fff;border:none;padding:15px;border-radius:50%;font-size:18px;cursor:pointer}
+  #overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);z-index:1100}
+}
+</style>
+</head>
+
+<body>
+
+<!-- MOBILE MENU -->
+<button id="menu-btn">☰</button>
+<div id="overlay"></div>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="progress-bar-bg"><div id="progress-bar" class="progress-bar"></div></div>
+    <div id="progress-text">0/0</div>
+    <h2 id="course-title">...</h2>
+  </div>
+  <div id="lessons-list"></div>
+</div>
+
+<div class="main-content">
+  <div class="video-wrapper" id="player-container"></div>
+  <div class="content-text">
+    <h1 id="lesson-title"></h1>
+    <div id="lesson-content"></div>
+    <div class="navigation-container">
+      <button id="next-btn" class="next-btn" disabled>Suivant</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+const STORAGE_KEY="connectedUID";
+
+/* ===== FIREBASE ===== */
+firebase.initializeApp({
+  apiKey:"AIzaSyAQeHWr_vUiQmVVgJJ_cOF9qrCCLd7IJNc",
+  databaseURL:"https://ayiweb-default-rtdb.firebaseio.com",
+  projectId:"ayiweb"
+});
+const db=firebase.database();
+
+/* ===== AUTH ===== */
+const uid=localStorage.getItem(STORAGE_KEY);
+if(!uid) location.href="../login.html";
+
+/* ===== PARAMS ===== */
+const courseId=new URLSearchParams(location.search).get("id");
+if(!courseId) location.href="../index.html";
+
+/* ===== GLOBAL ===== */
+let user={}, lessons=[], index=0, startTime=0;
+
+/* ===== LOAD USER ===== */
+db.ref("RJFORDROID/USERS/"+uid).once("value").then(s=>{
+  if(!s.exists()) location.href="../login.html";
+  user=s.val(); user.id=uid;
+  return db.ref(`RJFORDROID/USERS/${uid}/mes_cours/${courseId}`).once("value");
+}).then(s=>{
+  if(!s.exists()) location.href="../index.html";
+  loadCourse();
+});
+
+/* ===== LOAD COURSE ===== */
+function loadCourse(){
+  db.ref("RJFORDROID/COURE/"+courseId).once("value").then(s=>{
+    const c=s.val();
+    document.getElementById("course-title").innerText=c.NomCours;
+    lessons=Object.values(c.lessons).sort((a,b)=>a.numero-b.numero);
+
+    const list=document.getElementById("lessons-list");
+    list.innerHTML="";
+    lessons.forEach((l,i)=>{
+      const d=document.createElement("div");
+      d.className="lesson-item";
+      d.innerText=l.titre;
+      d.onclick=()=>loadLesson(i);
+      list.appendChild(d);
+    });
+
+    const done=user.mes_cours?.[courseId]?.lessons||{};
+    index=Math.min(Math.max(...Object.keys(done).map(Number),0),lessons.length-1)||0;
+    loadLesson(index);
+  });
+}
+
+/* ===== LOAD LESSON ===== */
+function loadLesson(i){
+  saveAnalytics();
+  startTime=Date.now();
+  index=i;
+  const l=lessons[i];
+
+  document.getElementById("lesson-title").innerText=l.titre;
+  document.getElementById("lesson-content").innerHTML=l.contenuHtml||"";
+  const vid=l.url||"";
+  let embed="";
+  if(vid.includes("youtube")){
+    let id=vid.split("v=")[1]||vid.split("/").pop();
+    if(id.includes("&")) id=id.split("&")[0];
+    embed=`<iframe src="https://www.youtube.com/embed/${id}" allowfullscreen></iframe>`;
+  }else embed=`<div style="color:white;padding:40px">Vidéo indisponible</div>`;
+  document.getElementById("player-container").innerHTML=embed;
+
+  updateProgress();
+}
+
+/* ===== PROGRESS ===== */
+function updateProgress(){
+  const p=Math.round(((index+1)/lessons.length)*100);
+  document.getElementById("progress-bar").style.width=p+"%";
+  document.getElementById("progress-text").innerText=`${index+1}/${lessons.length}`;
+
+  db.ref(`RJFORDROID/USERS/${uid}/mes_cours/${courseId}`).update({
+    progression:p,
+    ["lessons/"+index]:true
+  });
+
+  document.getElementById("next-btn").disabled=index>=lessons.length-1;
+}
+
+/* ===== NEXT ===== */
+document.getElementById("next-btn").onclick=()=>{
+  if(index<lessons.length-1) loadLesson(index+1);
+};
+
+/* ===== ANALYTICS ===== */
+function saveAnalytics(){
+  if(!startTime) return;
+  db.ref(`RJFORDROID/analytics/${courseId}/${index}/${uid}`).set({
+    duration:Date.now()-startTime,
+    at:Date.now()
+  });
+}
+
+/* ===== MOBILE SIDEBAR ===== */
+const sidebar=document.querySelector(".sidebar");
+const overlay=document.getElementById("overlay");
+const btn=document.getElementById("menu-btn");
+
+btn.onclick=()=>{
+  sidebar.classList.add("open");
+  overlay.style.display="block";
+};
+overlay.onclick=()=>{
+  sidebar.classList.remove("open");
+  overlay.style.display="none";
+};
+</script>
+</body>
+</html>

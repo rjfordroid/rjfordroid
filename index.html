@@ -16,6 +16,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
      crossorigin="anonymous"></script>
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="cours.css">
 <title>RJFORDROID – Chaine WhatsApp pour apprendre l'informatique Android</title>
 
 <meta name="google-adsense-account" content="ca-pub-4800728968697075">
@@ -111,6 +112,127 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 
   
+</section>
+
+<section id="cours" class="tab">
+        <!-- BOUTON MES COURS -->
+  <button id="btn-mes-cours" style="margin:10px;padding:10px 15px;background:#2563eb;color:white;border:none;border-radius:5px;cursor:pointer;">
+    Mes cours
+  </button>
+
+  <!-- CATALOGUE -->
+  <section class="mesCours" id="mes-cours-section">
+    <div id="catalogue-cours" class="course-grid"></div>
+    <div id="catalogue-loading" class="catalogue-loading">
+      <div class="spinner"></div>
+      <p>Chargement des cours…</p>
+    </div>
+  </section>
+
+  <!-- COURS INSCRIT CACHE -->
+  <div id="courInscrit" style="display:none; padding:10px;"></div>
+    <script>
+      
+      const btnMesCours = document.getElementById("btn-mes-cours");
+const courInscrit = document.getElementById("courInscrit");
+const mesCoursSection = document.getElementById("mes-cours-section");
+
+btnMesCours.onclick = async () => {
+  // Cacher catalogue, montrer coursInscrit
+  mesCoursSection.style.display = "none";
+  btnMesCours.style.display = "none";
+  courInscrit.style.display = "block";
+  await afficherCoursInscrits();
+
+  // Ajouter bouton back si pa gen deja
+  if (!document.getElementById("back-to-mescours")) {
+    const backBtn = document.createElement("button");
+    backBtn.id = "back-to-mescours";
+    backBtn.innerText = "← Retour aux cours";
+    backBtn.style.margin = "10px";
+    backBtn.style.padding = "8px 12px";
+    backBtn.style.background = "#1e293b";
+    backBtn.style.color = "#fff";
+    backBtn.style.border = "none";
+    backBtn.style.borderRadius = "5px";
+    backBtn.style.cursor = "pointer";
+
+    backBtn.onclick = () => {
+      courInscrit.style.display = "none";
+      mesCoursSection.style.display = "block";
+  btnMesCours.style.display = "block";
+      
+    };
+
+    courInscrit.prepend(backBtn);
+  }
+};
+      
+      async function afficherCoursInscrits() {
+  const div = document.getElementById("courInscrit");
+  if (!div) return;
+
+  div.innerHTML = "<p>Chargement...</p>";
+
+  const uid = localStorage.getItem("connectedUID");
+  if (!uid) {
+    div.innerHTML = "<p>Utilisateur non connecté</p>";
+    return;
+  }
+
+  const userSnap = await database.ref("RJFORDROID/USERS/" + uid).once("value");
+  const user = userSnap.val();
+
+  if (!user || !user.mes_cours) {
+    div.innerHTML = "<p>Aucun cours inscrit.</p>";
+    return;
+  }
+
+  const coursSnap = await database.ref("RJFORDROID/COURE").once("value");
+  if (!coursSnap.exists()) {
+    div.innerHTML = "<p>Aucun cours trouvé.</p>";
+    return;
+  }
+
+  div.innerHTML = "";
+
+  Object.keys(user.mes_cours).forEach(courseId => {
+    const cours = coursSnap.child(courseId).val();
+    if (!cours) return;
+
+    const totalLessons = Object.keys(cours.lessons || {}).length;
+    const doneLessons = Object.keys(
+      user.mes_cours[courseId].lessons || {}
+    ).length;
+
+    const progression = totalLessons
+      ? Math.round((doneLessons / totalLessons) * 100)
+      : 0;
+
+    const card = document.createElement("div");
+    card.className = "course-card inscrit";
+
+    card.innerHTML = `
+      <h4>${cours.NomCours || "Sans titre"}</h4>
+      <p>${cours.DesCours || ""}</p>
+
+      <div style="display:flex; gap:10px;">
+        <small>📘 ${totalLessons} leçons</small>
+        <small>📊 ${progression}%</small>
+      </div>
+
+      <button onclick="ouvrirCours('${courseId}')">
+        Continuer
+      </button>
+    `;
+
+    div.appendChild(card);
+  });
+}
+function ouvrirCours(courseId) {
+  window.location.href = `lecon.html?id=${courseId}`;
+}
+    </script>
 </section>
 
   <section id="list" class="tab">
@@ -266,6 +388,7 @@ if(tabButtons.length > 0) tabButtons[0].click();
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script src="config.js"></script>
 <script src="user.js"></script>
+<script src="cours.js"></script>
 <script src="chat.js"></script>
 <script src="visite.js"></script>
 
@@ -448,6 +571,7 @@ document.addEventListener("DOMContentLoaded", async function() {
   // 📌 Onglets principaux de navigation
   const tabs = {
     home: document.getElementById("home"),    // Onglet Accueil
+    cours: document.getElementById("cours"),    // Onglet Accueil
     list: document.getElementById("list"),
     chat: document.getElementById("chat"),// Onglet Liste des articles
     admin: document.getElementById("admin")   // Onglet Admin (futur usage)
@@ -1065,6 +1189,7 @@ if (currentTab !== tabName) {
 
   // 🔗 Écouteurs pour la navigation principale
   document.getElementById("btnHome")?.addEventListener("click", () => showTab('home'));
+  document.getElementById("btnCours")?.addEventListener("click", () => showTab('cours'));
   document.getElementById("btnList")?.addEventListener("click", () => showTab('list'));
   document.getElementById("btnChat")?.addEventListener("click", () => showTab('chat'));
   document.getElementById("btnAdmin")?.addEventListener("click", () => showTab('admin'));

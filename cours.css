@@ -1,0 +1,190 @@
+
+    
+/* ============================================================
+   5. CATALOGUE & COURSE CARDS
+   ============================================================ */
+@media all {
+    /* Grid katalòg la */
+    .course-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 10px;
+        padding: 2px;
+    }
+
+    /* Kat kou yo */
+    .course-card {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f1f5f9;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-color: #2563eb;
+    }
+
+    /* Tit ak Deskripsyon */
+    .course-card h4 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .course-card p {
+        font-size: 1.1rem;
+        text-align: justify;
+        color: #64748b;
+        margin-bottom: 15px;
+        line-height: 1.4;
+    }
+    .small{
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 5px;
+    }
+    .course-card small {
+        color: #64748b;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        width: 100%;
+    }
+
+    /* Badge yo */
+    .badge {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+        border-radius: 30px;
+        background: #eff6ff;
+        color: #2563eb;
+        font-weight: 600;
+    }
+
+    /* Social Stats (Like/Share) */
+    .social-stats {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        padding-top: 10px;
+        border-top: 1px solid #f8fafc;
+    }
+
+    .social-stats span {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .social-stats .liked {
+        color: #ef4444;
+    }
+
+    /* Bouton Pro */
+    .course-card button {
+        width: 100%;
+        padding: 12px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: 0.2s;
+        border: none;
+    }
+
+    .btn-enroll {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-share {
+        background: #f1f5f9;
+        color: #475569;
+        margin-bottom: 8px;
+    }
+
+    .btn-locked {
+        background: #f8fafc;
+        color: #94a3b8;
+        cursor: not-allowed;
+    }
+}
+
+
+/* ============================================================
+   6. SOCIAL FEATURES (LIKE & SHARE)
+   ============================================================ */
+@media all {
+    .social-stats {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 5px 0;
+        border-bottom: 1px solid #f1f5f9;
+        margin-bottom: 12px !important;
+    }
+
+    .social-stats span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .social-stats span:active { transform: scale(1.2); }
+
+    .liked-active { color: #ef4444 !important; }
+
+    .share-btn {
+        font-weight: 600;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        transition: background 0.3s ease;
+    }
+}
+
+.catalogue-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.catalogue-loading .spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+  

@@ -1,1 +1,899 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<title>RJFORDROID – RJ-TV</title>
+<link rel="stylesheet" href="style.css">
 
+<style>
+main{
+  height: 100vh;
+  overflow-y: hidden;
+}
+  #mainVideo{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+  #mainVideo h1{
+    background: green;
+    color: white;
+    text-align: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  #mainVideo h1 button{
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 10px;
+  }
+  #videoContent{
+    min-height: 300px;
+    max-height:auto;
+  }
+  video{
+    display: none;
+  }
+  video,iframe{
+    width: 100%;
+    min-height: 300px;
+    max-height: 500px;
+  }
+  .contentCommemt {
+    width: 100%;
+    position: absolute;
+    top: 350px;
+    left: 0;
+  height: calc(100vh - 198px - 255px);
+  display: flex;
+  flex-direction: column;
+}
+.listComment{
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+
+}
+
+/* ===============================
+   ACTION BAR PRO STYLE
+================================= */
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 1px;
+  padding: 10px 0;
+  border-top: 1px solid #eee;
+}
+
+/* ---- Like Button ---- */
+.action .like {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid black;
+  background: white;
+  color: black;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+.action .like i {
+  font-size: 16px;
+  transition: transform 0.2s ease;
+}
+
+/* Hover Effect */
+.action .like:hover {
+  background: none;
+  transform: scale(1.05);
+}
+
+/* Active (quand like) */
+.action .like.active {
+  background: none;
+}
+
+.action .like.active i {
+  transform: scale(1.2);
+}
+
+/* ---- Views & Comments ---- */
+.views,
+.commentsCount {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: #333;
+}
+
+.views i,
+.commentsCount i {
+  color: #555;
+  font-size: 16px;
+}
+
+/* Counter Numbers */
+#countLite,
+#countViews,
+#countComments {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .action {
+    gap: 12px;
+  }
+
+  .action .like {
+    padding: 6px 12px 6px 12px;
+    font-size: 14px;
+  }
+}
+.comment{
+  display: flex;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+.comment textarea{
+  display: flex;
+  align-items: center;
+  padding: 2px 10px;
+  width: 100%;
+ border-top-left-radius:50px;
+ border-bottom-left-radius:50px;
+}
+.comment button{
+   border-top-right-radius:50px;
+ border-bottom-right-radius:50px;
+ min-width:50px;
+}
+.comment .emoji{
+   border-top-right-radius:0px;
+ border-bottom-right-radius:0px;
+ min-width:50px;
+}
+
+
+.avatar-picker {
+  background: #111;
+  padding: 10px;
+  border-radius: 10px;
+  max-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  position: absolute;
+  bottom: 60px;
+  width: 100%;
+}
+
+
+.avatar-circle {
+    width: 35px;
+    height: 35px;
+    background-color: #ff3b3b; /* Koulè background avatar a */
+    color: white;
+    text-align: center;
+    line-height: 35px;
+    border-radius: 50%;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px;
+    border-bottom: 1px solid #333;
+}
+
+
+
+/* Lè veso a an Full Screen, fòse videyo/iframe pran 100% */
+#videoContent:fullscreen video, 
+#videoContent:fullscreen iframe {
+  width: 100vw;
+  height: 100vh;
+  max-height: none;
+}
+
+/* Pou iPhone/Safari */
+#videoContent:-webkit-full-screen video,
+#videoContent:-webkit-full-screen iframe {
+  width: 100%;
+  height: 100%;
+}
+
+#loadingMessage{
+  background:black;
+  color:white;
+  height: 298px;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:auto;
+}
+</style>
+<style>
+  /* ===============================
+   SIDEBAR OVERLAY PRO
+================================= */
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s ease;
+  z-index: 998;
+}
+
+#overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 260px;
+  height: 100vh;
+  background: #111;
+  color: white;
+  padding: 20px;
+  transition: 0.35s ease;
+  z-index: 999;
+  box-shadow: 5px 0 20px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+#sidebar.active {
+  left: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.sidebar-links {
+  list-style: none;
+  padding: 0;
+  margin-top: 30px;
+}
+
+.sidebar-links li {
+  margin-bottom: 20px;
+}
+
+.sidebar-links a {
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.2s;
+}
+
+.sidebar-links a:hover {
+  transform: translateX(5px);
+  color: lime;
+}
+</style>
+<style>
+  /* ================= LOGIN POPUP ================= */
+
+#loginPopup{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s ease;
+}
+
+#loginPopup.active{
+  opacity: 1;
+  visibility: visible;
+}
+
+.login-box{
+  background: #111;
+  padding: 30px;
+  border-radius: 15px;
+  width: 320px;
+  color: white;
+  transform: translateY(-20px);
+  transition: 0.3s ease;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+#loginPopup.active .login-box{
+  transform: translateY(0);
+}
+
+.login-box h2{
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-box input{
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+.login-box button{
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: lime;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#loginMessage{
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+</style>
+</head>
+<body>
+<!-- OVERLAY -->
+<div id="overlay"></div>
+  
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-header">
+    <h2>Menu</h2>
+    <button id="closeSidebar"><i class="fa fa-times"></i></button>
+  </div>
+  <div id="userInfo" style="display:flex;align-items:center;gap:10px;color:white;">
+  <i class="fa fa-user-circle" style="font-size:22px;"></i>
+  <div>
+    <div id="userName" style="font-weight:bold;"></div>
+    <small id="userEmail" style="color:gray;"></small>
+    <small id="isAdm"></small>
+  </div>
+</div>
+
+  <ul class="sidebar-links">
+    <li><a href="#"><i class="fa fa-home"></i> Accueil</a></li>
+    <li><a href="#"><i class="fa fa-video"></i> Vidéos</a></li>
+    <li><a href="#"><i class="fa fa-user"></i> Profil</a></li>
+    <li><a href="#"><i class="fa fa-right-from-bracket"></i> Déconnexion</a></li>
+  </ul>
+</aside>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("overlay");
+  const openBtn = document.getElementById("openSidebar");
+  const closeBtn = document.getElementById("closeSidebar");
+
+  if(!openBtn || !sidebar || !overlay) return;
+
+  openBtn.addEventListener("click", () => {
+    sidebar.classList.add("active");
+    overlay.classList.add("active");
+  });
+
+  closeBtn.addEventListener("click", closeSidebar);
+  overlay.addEventListener("click", closeSidebar);
+
+  function closeSidebar(){
+    sidebar.classList.remove("active");
+    overlay.classList.remove("active");
+  }
+});
+</script>
+
+<!-- LOGIN POPUP -->
+<div id="loginPopup">
+  <div class="login-box">
+    <form id="login">
+      <h2>Connexion</h2>
+
+      <input type="text" id="loginUsername" placeholder="Email ou Username" required>
+      <input type="password" id="loginPassword" placeholder="Mot de passe" required>
+
+      <button type="submit">Se connecter</button>
+
+      <p id="loginMessage"></p>
+    </form>
+  </div>
+</div>
+<main>
+  <div id="mainVideo">
+    <h1>RJ-TV 24 <button id="openSidebar">
+    <i class="fa fa-bars"></i>
+  </button>
+</h1>
+    <div id="videoContent">
+      <div id="loadingMessage">⏳ Loading...</div>
+    <video id="videoPlayer"></video>
+    <iframe id="iframePlayer"></iframe>
+     <p id="title"></p>
+<div class="action">
+  <button class="like">
+    <i class="fa-solid fa-thumbs-up"></i>
+    <span id="countLite">0</span>
+  </button>
+
+  <p class="views">
+    <i class="fa-solid fa-eye"></i>
+    <span id="countViews">0</span>
+  </p>
+
+  <p class="commentsCount">
+    <i class="fa-solid fa-comment"></i>
+    <span id="countComments">0</span>
+  </p>
+  
+    <button id="fullScreenBtn" style="background:none; border:none; cursor:pointer; color:black; font-size:18px; margin-left:auto;">
+    <i class="fa-solid fa-expand"></i>
+  </button>
+</div>
+    </div>
+</div>
+  <section class="video-section">
+   <div class="contentCommemt">
+  <div class="listComment"></div>
+  
+  <div id="avatarList" class="avatar-picker" style="display:none;"></div>
+<div id="avatarList" class="avatar-picker" style="display:none;"></div>
+
+
+  <div class="comment">
+    <textarea id="commentText" placeholder="Ekri yon kòmantè..."></textarea>
+    <button class="emoji" type="button" id="btnEmoji">
+      <i class="fa-regular fa-face-smile"></i>
+    </button>
+    <button id="sendComment">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
+
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="user.js"></script>
+<script>
+/*********************************
+ * FIREBASE INIT
+ *********************************/
+const firebaseConfig = {
+  apiKey: "AIzaSyAQeHWr_vUiQmVVgJJ_cOF9qrCCLd7IJNc",
+  authDomain: "ayiweb.firebaseapp.com",
+  databaseURL: "https://ayiweb-default-rtdb.firebaseio.com",
+  projectId: "ayiweb",
+  storageBucket: "ayiweb.appspot.com",
+  messagingSenderId: "115054504556",
+  appId: "1:115054504556:web:ccd713ba01dd8f02830649"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const database = firebase.database();
+
+
+
+/*********************************
+ * ELEMENTS UI
+ *********************************/
+const videoEl = document.getElementById("videoPlayer");
+const iframeEl = document.getElementById("iframePlayer");
+const loadingMessage = document.getElementById("loadingMessage");
+
+const titleEl = document.getElementById("title");
+const countViewsEl = document.getElementById("countViews");
+const countLiteEl = document.getElementById("countLite");
+const countCommentsEl = document.getElementById("countComments");
+
+const likeBtn = document.querySelector(".like");
+const commentList = document.querySelector(".listComment");
+const commentInput = document.querySelector("textarea");
+const sendBtn = document.getElementById("sendComment");
+const avatarList = document.getElementById("avatarList");
+const btnEmoji = document.getElementById("btnEmoji");
+
+/*********************************
+ * GLOBAL
+ *********************************/
+let currentVideoKey = null;
+let currentVideoRef = null;
+
+/*********************************
+ * LOAD online VIDEO
+ *********************************/
+/*********************************
+ * LOAD online VIDEO ONLY
+ *********************************/
+/*********************************
+ * LOAD online VIDEO (STRICT)
+ *********************************/
+database.ref("videos").on("value", snapshot => {
+  const videos = snapshot.val();
+  let videoFound = false;
+
+  // Seleksyon seksyon kòmantè ak aksyon pou nou kache yo si pa gen video
+  const actionSection = document.querySelector(".action");
+  const commentSection = document.querySelector(".contentCommemt");
+
+  snapshot.forEach(childSnapshot => {
+    const video = childSnapshot.val();
+    
+    if (video.enLigne === true) {
+      videoFound = true;
+      currentVideoKey = childSnapshot.key;
+      currentVideoRef = database.ref("videos/" + currentVideoKey);
+
+      loadingMessage.style.display = "none";
+      titleEl.textContent = video.title || "";
+      
+      // Montre seksyon yo si yo te kache
+      if(actionSection) actionSection.style.display = "flex";
+      if(commentSection) commentSection.style.display = "flex";
+
+      if (video.type === "mp4" && video.url?.startsWith("http")) {
+  iframeEl.style.display = "none";
+  videoEl.src = video.url;
+  videoEl.style.display = "block";
+  videoEl.autoplay = true; // Ajoute sa
+  videoEl.muted = false; // Ajoute sa (pou pèmèt autoplay)
+  videoEl.load();
+  videoEl.play().catch(e => console.log("Autoplay bloke:", e));
+} else {
+        videoEl.style.display = "none";
+        let youtubeId = video.url;
+        if (youtubeId.includes("youtube.com") || youtubeId.includes("youtu.be")) {
+          const match = youtubeId.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/);
+          if (match) youtubeId = match[1];
+        }
+    iframeEl.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=0&rel=0`;
+
+        iframeEl.style.display = "block";
+      }
+
+      const viewedKey = "viewed_" + currentVideoKey;
+      if (!localStorage.getItem(viewedKey)) {
+        currentVideoRef.child("views").transaction(v => (v || 0) + 1);
+        localStorage.setItem(viewedKey, "true");
+      }
+
+      currentVideoRef.child("views").on("value", snap => { countViewsEl.textContent = snap.val() || 0; });
+      currentVideoRef.child("Applikes").on("value", snap => { countLiteEl.textContent = snap.val() || 0; });
+      currentVideoRef.child("comments").on("value", snap => { countCommentsEl.textContent = snap.numChildren(); });
+
+      loadComments();
+    }
+  });
+
+  // SI OKENN VIDEO PA ONLINE
+  if (!videoFound) {
+    videoEl.style.display = "none";
+    videoEl.pause();
+    iframeEl.style.display = "none";
+    iframeEl.src = "";
+    
+    // Kache bouton Like ak seksyon kòmantè nèt
+    if(actionSection) actionSection.style.display = "none";
+    if(commentSection) commentSection.style.display = "none";
+
+    // Mesaj Alèt la
+    titleEl.innerHTML = `<div style="color: #ff4444; font-weight: bold; padding: 20px; text-align: center;">
+      <i class="fa fa-circle-exclamation"></i> TV A FERMÉ POU KOUNYE A
+    </div>`;
+    
+    loadingMessage.style.display = "block";
+    loadingMessage.innerHTML = `
+      <div style="background: rgba(255,0,0,0.1); border: 1px dashed red; padding: 15px; border-radius: 10px;">
+        <p style="color: red; margin: 0; font-size: 14px;">🔴 Estasyon an pa emèt okenn signal.</p>
+        <small style="color: #666;">Tanpri tounen pita.</small>
+      </div>
+    `;
+  }
+});
+
+
+
+
+/*********************************
+ * LIKE SYSTEM (1 par appareil)
+ *********************************/
+likeBtn.addEventListener("click", () => {
+
+  if (!currentVideoRef) return;
+
+  const likedKey = "liked_" + currentVideoKey;
+
+  if (localStorage.getItem(likedKey)) return;
+
+  currentVideoRef.child("Applikes")
+    .transaction(l => (l || 0) + 1);
+
+  localStorage.setItem(likedKey, "true");
+  likeBtn.classList.add("active");
+});
+
+/*********************************
+ * LOAD COMMENTS
+ *********************************/
+function loadComments() {
+  if (!currentVideoKey) return;
+
+  const commentRef = database.ref("videos/" + currentVideoKey + "/comments");
+  commentList.innerHTML = "";
+
+  commentRef.limitToLast(50).on("child_added", snap => {
+    const comment = snap.val();
+    const username = comment.username || "Utilisateur";
+    
+    // Jwenn premye lèt la
+    const firstLetter = username.charAt(0).toUpperCase();
+
+    const div = document.createElement("div");
+    div.className = "comment-item"; // Sèvi ak klas CSS nou an
+
+    div.innerHTML = `
+      <div class="avatar-circle">${firstLetter}</div>
+      <div style="flex: 1;">
+        <strong style="color:lime; font-size: 14px;">${username}</strong>
+        <p style="margin:3px 0; color: black; font-size: 15px;">${comment.text}</p>
+        <small style="color:black; font-size: 11px;">
+          ${new Date(comment.date).toLocaleString()}
+        </small>
+      </div>
+    `;
+
+    commentList.appendChild(div);
+    commentList.scrollTop = commentList.scrollHeight;
+  });
+}
+
+
+/*********************************
+ * SEND COMMENT
+ *********************************/
+/*********************************
+ * SEND COMMENT (WITH LOGIN CHECK)
+ *********************************/
+sendBtn.addEventListener("click", async () => {
+
+  const text = commentInput.value.trim();
+  if (!text || !currentVideoKey) return;
+
+  const uid = localStorage.getItem("connectedUID");
+
+  // ❌ Si pa konekte → montre login popup
+  if (!uid) {
+    const loginPopup = document.getElementById("loginPopup");
+    loginPopup.classList.add("active");
+    return;
+  }
+
+  try {
+
+    // ✅ Chèche user info
+    const snap = await firebase
+      .database()
+      .ref("RJFORDROID/USERS/" + uid)
+      .once("value");
+
+    const user = snap.val();
+    if (!user) return;
+
+    const username = user.username || "Utilisateur";
+
+    // ✅ Voye comment ak username
+    await database
+  .ref("videos/" + currentVideoKey + "/comments")
+  .push({
+  text: text,
+  username: username,
+  avatar: selectedAvatar || "",
+  uid: uid,
+  date: Date.now()
+});
+
+
+
+    commentInput.value = "";
+
+  } catch (err) {
+    console.error("Erreur envoi comment:", err);
+  }
+
+});
+</script>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+
+  const loginPopup    = document.getElementById("loginPopup");
+  const loginForm     = document.getElementById("login");
+  const loginUsername = document.getElementById("loginUsername");
+  const loginPassword = document.getElementById("loginPassword");
+  const loginMessage  = document.getElementById("loginMessage");
+
+  const userNameEl    = document.getElementById("userName");
+  const userEmailEl   = document.getElementById("userEmail");
+  
+  // Seleksyone bouton dekonnyeksyon an nan sidebar la
+  const logoutBtn     = document.querySelector(".sidebar-links a i.fa-right-from-bracket")?.parentElement;
+
+  /*********************************
+   * 1. TCHEKE SI ITILIZATÈ A TE KONEKTE DEJA
+   *********************************/
+  const uidStored = localStorage.getItem("connectedUID");
+
+  if (uidStored) {
+    loadUserDetails(uidStored);
+    loginPopup.classList.remove("active"); // Si l konekte, pa montre popup
+  } else {
+    // Si w vle popup la parèt sèlman lè l klike sou yon bagay, retire liy anba a
+    // loginPopup.classList.add("active"); 
+  }
+
+  /*********************************
+   * 2. CHACHE ENFÒMASYON NAN FIREBASE
+   *********************************/
+  /*********************************
+   * LOAD USER DETAILS (AK CHECK ADMIN)
+   *********************************/
+async function loadUserDetails(uid) {
+  if (!uid) return;
+
+  const isAdmEl = document.getElementById("isAdm");
+
+  try {
+    const snap = await firebase
+      .database()
+      .ref("RJFORDROID/USERS/" + uid)
+      .once("value");
+
+    const user = snap.val();
+
+    console.log("UID:", uid);
+    console.log("User data:", user);
+
+    if (!user) return;
+
+    userNameEl.textContent = user.username || "Utilisateur";
+    userEmailEl.textContent = user.email || "";
+
+    if (user.role === "admin" || user.isAdmin === true) {
+      isAdmEl.textContent = "Admin";
+      isAdmEl.style.color = "lime";
+      isAdmEl.style.display = "block";
+      isAdmEl.style.fontWeight = "bold";
+    } else {
+      isAdmEl.textContent = "";
+      isAdmEl.style.display = "none";
+    }
+
+  } catch (err) {
+    console.error("Erreur chargement user:", err);
+  }
+}
+
+
+
+  /*********************************
+   * 3. SISTÈM LOGIN LAN
+   *********************************/
+  loginForm.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const identifier = loginUsername.value.trim();
+    const password   = loginPassword.value.trim();
+
+    loginMessage.style.color = "orange";
+    loginMessage.textContent = "Connexion...";
+
+    try {
+      const snap = await firebase.database().ref("RJFORDROID/USERS").once("value");
+      const users = snap.val() || {};
+      let uid = null;
+
+      for (const k in users) {
+        const u = users[k];
+        if ((u.username === identifier || u.email === identifier) && u.password === password) {
+          uid = k;
+          break;
+        }
+      }
+
+      if (!uid) {
+        loginMessage.style.color = "red";
+        loginMessage.textContent = "Identifiants incorrects";
+        return;
+      }
+
+      // SOVE UID A NAN MEMWA TELEFÒN NAN
+      localStorage.setItem("connectedUID", uid);
+
+      loginMessage.style.color = "lime";
+      loginMessage.textContent = "Connexion réussie";
+
+      loadUserDetails(uid);
+
+      setTimeout(() => {
+        loginPopup.classList.remove("active");
+      }, 800);
+
+    } catch (err) {
+      loginMessage.style.color = "red";
+      loginMessage.textContent = "Erreur connexion";
+    }
+  });
+
+  /*********************************
+   * 4. SISTÈM DEKONNYEKSYON (LOGOUT)
+   *********************************/
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      localStorage.removeItem("connectedUID"); // Efase UID a
+      location.reload(); // Rafrechi paj la pou reset tout bagay
+    });
+  }
+
+});
+
+</script>
+</body>
+</html>

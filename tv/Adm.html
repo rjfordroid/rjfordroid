@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - RJFORDROID</title>
+    <style>
+        body { font-family: Arial; background: #111; color: white; padding: 20px; }
+        /* LOGIN POPUP */
+        #loginPopup { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 999; }
+        .login-box { background: #222; padding: 25px; border-radius: 10px; width: 300px; }
+        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: none; }
+        button { padding: 6px 12px; background: #ff3b3b; border: none; color: white; border-radius: 6px; cursor: pointer; margin-top: 5px; }
+        .admin-card { background: #222; padding: 15px; margin-top: 15px; border-radius: 10px; }
+        .comment-item { border-top: 1px solid #333; padding: 5px 0; font-size: 14px; color: #ccc; }
+        .online-badge { color: #4CAF50; font-weight: bold; margin-left: 10px; }
+        .offline-badge { color: #ff3b3b; font-weight: bold; margin-left: 10px; }
+        .btn-online { background: #4CAF50; margin-right: 5px; }
+        .btn-offline { background: #ff9800; margin-right: 5px; }
+        .button-group { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
+        
+        
+        .comment-admin-list {
+    background: #333;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.comment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #444;
+    font-size: 13px;
+}
+.comment-item:last-child { border-bottom: none; }
+.btn-del-comm {
+    background: #ff4d4d;
+    padding: 2px 6px;
+    font-size: 11px;
+    margin-left: 10px;
+}
+
+
+/* Styling bouton tab yo */
+.btnTab {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+}
+
+.btnTab button {
+    background: #222;
+    color: white;
+    border: 1px solid #444;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btnTab button.active {
+    background: #ff3b3b;
+    border-color: #ff3b3b;
+}
+
+/* Lojik pou kache/montre kontni */
+.tab-content {
+    display: none; /* Tout tab kache pa defo */
+}
+
+.tab-content.active {
+    display: block; /* Sèlman tab ki aktif la k ap parèt */
+}
+
+    </style>
+</head>
+<body>
+    <!-- LOGIN POPUP -->
+    <div style="display:none;" id="loginPopup">
+        <div class="login-box">
+            <h3>🔐 Connexion Admin</h3>
+            <input type="text" id="loginIdentifier" placeholder="Nom d'utilisateur ou email">
+            <input type="password" id="loginPassword" placeholder="Mot de passe">
+            <button onclick="loginAdmin()">Se connecter</button>
+            <p id="loginMessage" style="margin-top: 10px;"></p>
+        </div>
+    </div>
+<div class="btnTab">
+    <button class="tab-btn active" data-target="addVideoTab">Ajouter Vidéo</button>
+    <button class="tab-btn" data-target="videoListTab">Liste des Vidéos</button>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const target = btn.getAttribute("data-target");
+
+            // 1. Retire klas 'active' nan tout bouton
+            tabButtons.forEach(b => b.classList.remove("active"));
+            // 2. Retire klas 'active' nan tout kontni
+            tabContents.forEach(c => c.classList.remove("active"));
+
+            // 3. Ajoute 'active' sou bouton ki klike a epi sou kontni ki koresponn lan
+            btn.classList.add("active");
+            document.getElementById(target).classList.add("active");
+        });
+    });
+});
+
+</script>
+
+<main>
+<div id="addVideoTab" class="tab-content active">
+    <div class="admin-card">
+        <h3>Ajouter vidéo</h3>
+        <input type="text" id="title" placeholder="Titre">
+        <textarea id="description" placeholder="Description"></textarea>
+        <input type="text" id="url" placeholder="URL (YouTube ou MP4)">
+        
+        <label style="display:block; margin-bottom:5px; font-size:12px; color:lime;">Planifier la mise en ligne (Optionnel) :</label>
+        <input type="time" id="scheduleTime">
+        
+        <button id="addVideo">Ajouter vidéo</button>
+    </div>
+</div>
+
+
+    <div id="videoListTab" class="tab-content">
+        <h2>📂 Liste des vidéos</h2>
+        <div id="adminVideoList"></div>
+    </div>
+</main>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+     <script src="config.js"></script>
+    <script>
+        const db = firebase.database();
+        
+        const adminList = document.getElementById("adminVideoList");
+        const loginPopup = document.getElementById("loginPopup");
+        const loginMessage = document.getElementById("loginMessage");
+
+        // 🔐 LOGIN ADMIN
+        async function loginAdmin() {
+            const identifier = document.getElementById("loginIdentifier").value.trim();
+            const password = document.getElementById("loginPassword").value.trim();
+            
+            if(!identifier || !password) {
+                loginMessage.style.color = "red";
+                loginMessage.textContent = "Remplir tous les champs.";
+                return;
+            }
+            
+            loginMessage.style.color = "white";
+            loginMessage.textContent = "Connexion...";
+            
+            try {
+                const snap = await db.ref("RJFORDROID/USERS").once("value");
+                const users = snap.val() || {};
+                let uid = null;
+                
+                for(const key in users) {
+                    const u = users[key];
+                    const userPass = u.password || u.pass || "";
+                    if( (u.username === identifier || u.email === identifier) && userPass === password && u.role === "admin" ) {
+                        uid = key;
+                        break;
+                    }
+                }
+                
+                if(!uid) {
+                    loginMessage.style.color = "red";
+                    loginMessage.textContent = "Accès refusé.";
+                    return;
+                }
+                
+                localStorage.setItem("connectedUID", uid);
+                loginMessage.style.color = "lime";
+                loginMessage.textContent = "Connexion réussie";
+                setTimeout(() => {
+                    loginPopup.style.display = "none";
+                }, 500);
+            } catch(err) {
+                console.error(err);
+                loginMessage.style.color = "red";
+                loginMessage.textContent = "Erreur de connexion, réessayez.";
+            }
+        }
+
+        // 🔎 SI DEJA CONNECTE
+        async function checkSession() {
+            const uid = localStorage.getItem("connectedUID");
+            if(!uid) return;
+            
+            try {
+                const snap = await db.ref("RJFORDROID/USERS/" + uid).once("value");
+                const user = snap.val();
+                if(user && user.role === "admin") {
+                    loginPopup.style.display = "none";
+                } else {
+                    localStorage.removeItem("connectedUID");
+                }
+            } catch(err) {
+                console.error(err);
+            }
+        }
+        
+        checkSession();
+
+// ➕ Ajouter vidéo ak Planifikasyon
+
+document.getElementById("addVideo").addEventListener("click", async () => {
+    const title = document.getElementById("title").value.trim();
+    const desc = document.getElementById("description").value.trim();
+    const url = document.getElementById("url").value.trim();
+    const scheduleTime = document.getElementById("scheduleTime").value;
+    
+    if(!title || !url) {
+        alert("Titre et URL obligatoires.");
+        return;
+    }
+    
+    let type = "mp4";
+    if(url.includes("youtube.com") || url.includes("youtu.be")) type = "youtube";
+    
+    const newVideoRef = db.ref("videos").push();
+    const videoKey = newVideoRef.key;
+
+    // Kreye objè videyo a
+    const videoData = {
+        title: title,
+        description: desc,
+        url: url,
+        type: type,
+        date: Date.now(),
+        likes: 0,
+        views: 0,
+        enLigne: false, // Toujou kòmanse false
+        scheduledAt: scheduleTime || null 
+    };
+
+    try {
+        await newVideoRef.set(videoData);
+
+        if (scheduleTime) {
+            // --- LOJIK PLANIFIKASYON ---
+            const now = new Date();
+            const [hours, minutes] = scheduleTime.split(':');
+            const targetDate = new Date();
+            targetDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+            if (targetDate < now) {
+                targetDate.setDate(targetDate.getDate() + 1);
+            }
+
+            const diff = targetDate.getTime() - now.getTime();
+
+            setTimeout(() => {
+                // Lè tan an rive, li mete sa a online epi koupe tout lòt yo
+                setOnlyOneOnline(videoKey);
+                console.log(`Vidéo "${title}" est maintenant en ligne !`);
+            }, diff);
+
+            alert(`Vidéo planifiée pour ${scheduleTime}. Elle coupera les autres à cette heure.`);
+        } else {
+            // Si pa gen planifikasyon, nou mete l online dirèkteman epi koupe rès yo
+            setOnlyOneOnline(videoKey);
+            alert("Vidéo ajoutée et mise en ligne !");
+        }
+
+        // Netwaye fòm nan
+        document.getElementById("title").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("url").value = "";
+        document.getElementById("scheduleTime").value = "";
+
+    } catch (err) {
+        alert("Erreur: " + err.message);
+    }
+});
+
+// Asire w fonksyon yo aksesib nan HTML
+window.toggleEnLigne = toggleEnLigne;
+
+
+/**
+ * Mete tout videyo offline, epi limen sèlman videyo ki gen ID sa a
+ */
+async function setOnlyOneOnline(targetVideoId) {
+    try {
+        // 1. Chache tout videyo yo
+        const snapshot = await db.ref("videos").once("value");
+        const updates = {};
+
+        snapshot.forEach(child => {
+            const vidId = child.key;
+            // Si se videyo nou vle a, mete l true, sinon mete l false
+            updates[`${vidId}/enLigne`] = (vidId === targetVideoId);
+            
+            // Si se sa n ap limen an, nou pwofite retire planifikasyon an
+            if (vidId === targetVideoId) {
+                updates[`${vidId}/scheduledAt`] = null;
+            }
+        });
+
+        // 2. Voye tout chanjman yo an yon sèl fwa nan Firebase
+        await db.ref("videos").update(updates);
+        console.log("Mise à jour réussie : une seule vidéo en ligne.");
+    } catch (err) {
+        console.error("Erreur switch online:", err);
+    }
+}
+
+        // Fonction pour mettre à jour le statut en ligne
+function toggleEnLigne(id, currentStatus) {
+    if (!currentStatus) {
+        // Si nou vle mete l online, nou fè l vin sèl ki online
+        setOnlyOneOnline(id);
+    } else {
+        // Si se koupe nou t ap koupe l, nou jis mete l false senp
+        db.ref("videos/" + id).update({ enLigne: false });
+    }
+}
+
+
+        // 📂 LISTE VIDEOS
+// 📂 LISTE VIDEOS AK KÒMANTÈ
+// Jwenn pati sa nan kòd ou a epi ranplase blòk la
+db.ref("videos").orderByChild("date").on("value", snapshot => {
+    adminList.innerHTML = "";
+    snapshot.forEach(child => {
+        const videoId = child.key;
+        const video = child.val();
+        const div = document.createElement("div");
+        div.className = "admin-card";
+        
+        const enLigne = video.enLigne || false;
+        const statusBadge = enLigne ? 
+            '<span class="online-badge">● EN LIGNE</span>' : 
+            '<span class="offline-badge">● HORS LIGNE</span>';
+        
+        // ✅ Tcheke si gen yon planifikasyon
+        let scheduleInfo = "";
+        if (!enLigne && video.scheduledAt) {
+            scheduleInfo = `<p style="color: #00d4ff; font-size: 13px;">
+                <i class="fa fa-clock"></i> Planifié pour : <strong>${video.scheduledAt}</strong>
+            </p>`;
+        }
+        
+        // Prepare seksyon kòmantè yo (pa chanje)
+        let commentsHTML = `<div class="comment-admin-list"><strong>💬 Commentaires :</strong>`;
+        // ... (rest kòd kòmantè a rete menm jan an)
+        if (video.comments) {
+            Object.keys(video.comments).forEach(commKey => {
+                const c = video.comments[commKey];
+                commentsHTML += `<div class="comment-item"><span><strong>${c.username || 'User'}:</strong> ${c.text}</span><button class="btn-del-comm" onclick="deleteComment('${videoId}', '${commKey}')">Supprimer</button></div>`;
+            });
+        } else { commentsHTML += `<p style="font-size:12px; color:gray;">Aucun commentaire.</p>`; }
+        commentsHTML += `</div>`;
+
+        div.innerHTML = `
+            <h3>${video.title} ${statusBadge}</h3>
+            ${scheduleInfo} <p>${video.description || ''}</p>
+            <p>👁 ${video.views || 0} | ❤️ ${video.Applikes || 0}</p>
+            <div class="button-group">
+                <button class="${enLigne ? 'btn-offline' : 'btn-online'}" onclick="toggleEnLigne('${videoId}', ${enLigne})">
+                    ${enLigne ? 'Mettre hors ligne' : 'Mettre en ligne'}
+                </button>
+                <button onclick="deleteVideo('${videoId}')" style="background: #ff3b3b;">Supprimer Vidéo</button>
+            </div>
+            ${commentsHTML}
+        `;
+        adminList.appendChild(div);
+    });
+});
+
+
+// ❌ Siprime yon kòmantè espesifik
+function deleteComment(videoId, commKey) {
+    if(confirm("Voulez-vous supprimer ce commentaire ?")) {
+        db.ref(`videos/${videoId}/comments/${commKey}`).remove()
+          .then(() => console.log("Commentaire supprimé"))
+          .catch(err => alert("Erreur: " + err.message));
+    }
+}
+
+// Rann fonksyon an disponib globalman
+window.deleteComment = deleteComment;
+
+        // ❌ Supprimer vidéo
+        function deleteVideo(id) {
+            if(confirm("Supprimer cette vidéo ?")) {
+                db.ref("videos/" + id).remove();
+            }
+        }
+
+        // Rendre les fonctions disponibles globalement
+        window.loginAdmin = loginAdmin;
+        window.toggleEnLigne = toggleEnLigne;
+        window.deleteVideo = deleteVideo;
+    </script>
+</body>
+</html>

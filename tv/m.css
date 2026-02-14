@@ -1,0 +1,415 @@
+@media all {
+    /* =====================================================
+       CATÉGORIE 1 : STRUCTURE PRINCIPALE DE LA PAGE
+       Contient les éléments de base du layout principal
+    ===================================================== */
+    main {
+        height: 100vh;
+        overflow-y: hidden;
+    }
+
+    /* =====================================================
+       CATÉGORIE 2 : SECTION VIDÉO PRINCIPALE
+       Gère l'affichage et le positionnement de la vidéo
+    ===================================================== */
+    #mainVideo {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+    }
+
+    #mainVideo h1 {
+        background: green;
+        color: white;
+        text-align: center;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    #mainVideo h1 button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: 10px;
+    }
+
+    /* =====================================================
+       CATÉGORIE 3 : CONTENEUR VIDÉO
+       Gestion des dimensions et du contenu vidéo/iframe
+    ===================================================== */
+    #videoContent {
+        min-height: 300px;
+        max-height: auto;
+    }
+
+    video {
+        display: none;
+    }
+
+    video, iframe {
+        width: 100%;
+        min-height: 300px;
+        max-height: 500px;
+    }
+
+    /* =====================================================
+       CATÉGORIE 4 : SECTION COMMENTAIRES
+       Positionnement et structure des commentaires
+    ===================================================== */
+    .contentCommemt {
+        width: 100%;
+        position: absolute;
+        top: 350px;
+        left: 0;
+        height: calc(100vh - 198px - 255px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .listComment {
+        flex: 1;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    /* =====================================================
+       CATÉGORIE 5 : BARRE D'ACTIONS
+       Likes, vues et compteurs (version professionnelle)
+    ===================================================== */
+    .action {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-top: 1px;
+        padding: 10px 0;
+        border-top: 1px solid #eee;
+    }
+
+    /* ---- Bouton Like ---- */
+    .action .like {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border: 1px solid black;
+        background: white;
+        color: black;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.25s ease;
+    }
+
+    .action .like i {
+        font-size: 16px;
+        transition: transform 0.2s ease;
+    }
+
+    /* Effet au survol */
+    .action .like:hover {
+        background: none;
+        transform: scale(1.05);
+    }
+
+    /* État actif (quand like) */
+    .action .like.active {
+        background: none;
+    }
+
+    .action .like.active i {
+        transform: scale(1.2);
+    }
+
+    /* ---- Vues & Commentaires ---- */
+    .views,
+    .commentsCount {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .views i,
+    .commentsCount i {
+        color: #555;
+        font-size: 16px;
+    }
+
+    /* Compteurs numériques */
+    #countLite,
+    #countViews,
+    #countComments {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* =====================================================
+       CATÉGORIE 6 : FORMULAIRE DE COMMENTAIRE
+       Zone de saisie et boutons d'envoi
+    ===================================================== */
+    .comment {
+        display: flex;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+    }
+
+    .comment textarea {
+        display: flex;
+        align-items: center;
+        padding: 2px 10px;
+        width: 100%;
+        border-top-left-radius: 50px;
+        border-bottom-left-radius: 50px;
+    }
+
+    .comment button {
+        border-top-right-radius: 50px;
+        border-bottom-right-radius: 50px;
+        min-width: 50px;
+    }
+
+    .comment .emoji {
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;
+        min-width: 50px;
+    }
+
+    /* =====================================================
+       CATÉGORIE 7 : SÉLECTEUR D'AVATAR
+       Interface de choix des avatars
+    ===================================================== */
+    .avatar-picker {
+        background: #111;
+        padding: 10px;
+        border-radius: 10px;
+        max-height: 120px;
+        overflow-y: auto;
+        display: flex;
+        flex-wrap: wrap;
+        position: absolute;
+        bottom: 60px;
+        width: 100%;
+    }
+
+    .avatar-circle {
+        width: 35px;
+        height: 35px;
+        background-color: #ff3b3b;
+        color: white;
+        text-align: center;
+        line-height: 35px;
+        border-radius: 50%;
+        font-weight: bold;
+        text-transform: uppercase;
+        display: inline-block;
+        margin-right: 10px;
+        font-size: 16px;
+    }
+
+    .comment-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 12px;
+        border-bottom: 1px solid #333;
+    }
+
+    /* =====================================================
+       CATÉGORIE 8 : MODE PLEIN ÉCRAN
+       Gestion de l'affichage en plein écran
+    ===================================================== */
+    #videoContent:fullscreen video, 
+    #videoContent:fullscreen iframe {
+        width: 100vw;
+        height: 100vh;
+        max-height: none;
+    }
+
+    /* Support iPhone/Safari */
+    #videoContent:-webkit-full-screen video,
+    #videoContent:-webkit-full-screen iframe {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* =====================================================
+       CATÉGORIE 9 : MESSAGE DE CHARGEMENT
+       Indicateur de chargement
+    ===================================================== */
+    #loadingMessage {
+        background: black;
+        color: white;
+        height: 298px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: auto;
+    }
+
+    /* =====================================================
+       CATÉGORIE 10 : SIDEBAR OVERLAY
+       Menu latéral et superposition
+    ===================================================== */
+    #overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(3px);
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s ease;
+        z-index: 998;
+    }
+
+    #overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 260px;
+        height: 100vh;
+        background: #111;
+        color: white;
+        padding: 20px;
+        transition: 0.35s ease;
+        z-index: 999;
+        box-shadow: 5px 0 20px rgba(0,0,0,0.3);
+        display: flex;
+        flex-direction: column;
+    }
+
+    #sidebar.active {
+        left: 0;
+    }
+
+    .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .sidebar-header button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    .sidebar-links {
+        list-style: none;
+        padding: 0;
+        margin-top: 30px;
+    }
+
+    .sidebar-links li {
+        margin-bottom: 20px;
+    }
+
+    .sidebar-links a {
+        text-decoration: none;
+        color: white;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: 0.2s;
+    }
+
+    .sidebar-links a:hover {
+        transform: translateX(5px);
+        color: lime;
+    }
+
+    /* =====================================================
+       CATÉGORIE 11 : POPUP DE CONNEXION
+       Fenêtre modale d'authentification
+    ===================================================== */
+    #loginPopup {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5000;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.3s ease;
+    }
+
+    #loginPopup.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .login-box {
+        background: #111;
+        padding: 30px;
+        border-radius: 15px;
+        width: 320px;
+        color: white;
+        transform: translateY(-20px);
+        transition: 0.3s ease;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+
+    #loginPopup.active .login-box {
+        transform: translateY(0);
+    }
+
+    .login-box h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .login-box input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: none;
+        outline: none;
+    }
+
+    .login-box button {
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        background: lime;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    #loginMessage {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    /* =====================================================
+       CATÉGORIE 12 : MEDIA QUERIES (Responsive)
+       Adaptations pour petits écrans
+    ===================================================== */
+    @media (max-width: 600px) {
+        .action {
+            gap: 12px;
+        }
+
+        .action .like {
+            padding: 6px 12px 6px 12px;
+            font-size: 14px;
+        }
+    }
+}
